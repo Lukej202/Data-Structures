@@ -35,6 +35,8 @@ public:
 
     bool search(std::string k);
 
+    int get(std::string k);
+
     bool deleteKey(std::string k);
 
     void Print();
@@ -50,10 +52,11 @@ enum class BucketType { NORMAL, ESS, EAR };
 /// all members of HashTableBucket are public to make it easy
 /// methods are defined in HashTable.cpp,
 /// they are already written for you
+///
+/// I modifies the HashTableBucket class a little to fit my solution for chaining
+/// instead of a bucket holding a value and a key it holds a linked list each node has a value and a key
 class HashTableBucket {
 public:
-    std::string key;
-    int value;
     bucketLinkedList bucketList;
     BucketType type;
 
@@ -61,13 +64,9 @@ public:
 
     HashTableBucket(const std::string& k, int v);
 
-    void load(const std::string& k, int v);
+    void load();
 
     void kill();
-
-    std::string getKey() const;
-
-    int getValue() const;
 
     bucketLinkedList getBucketList() const;
 

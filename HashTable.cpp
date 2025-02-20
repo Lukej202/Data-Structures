@@ -7,6 +7,7 @@
 #include "HashTable.h"
 
 #include <chrono>
+#include <iostream>
 #include <numeric>
 #include <random>
 #include <utility>
@@ -32,6 +33,10 @@ HashTable::HashTable(size_t initCapacity) {
 /// otherwise return true
 bool HashTable::insert(const string& key, int value) {
     size_t hash = hash(key);
+    //if the buckets linked list was empty this sets the bucket type to normal
+    if (buckets[hash].getBucketList().head == nullptr) {
+        buckets[hash].load();
+    }
     buckets[hash].getBucketList().insert(key, value);
     return {};
 }
@@ -44,6 +49,10 @@ bool HashTable::insert(const string& key, int value) {
 /// @return true if the key was found and removed, otherwise false
 bool HashTable::remove(const string& key) {
     size_t hash = hash(key);
+    //sets the bucket to EAR if the Linked list in the bucket only has one item
+    if (buckets[hash].getBucketList().head->next == nullptr) {
+        buckets[hash].kill();
+    }
     buckets[hash].getBucketList().deleteKey(key);
     return {};
 }
@@ -54,8 +63,8 @@ bool HashTable::remove(const string& key) {
 /// @return true if given key is in the table, otherwise false
 bool HashTable::contains(const string& key) const {
     size_t hash = hash(key);
-    buckets[hash].getBucketList().search(key);
-    return {};
+
+    return buckets[hash].getBucketList().search(key);
 }
 
 /// get(key)
@@ -64,8 +73,8 @@ bool HashTable::contains(const string& key) const {
 /// @return the value associated with the key, if the key is not
 /// in the table find returns nullopt
 optional<int> HashTable::get(const string& key) const {
-
-    return {};
+    size_t hash = hash(key);
+    return  buckets[hash].getBucketList().get(key);
 }
 
 /// operator[key]
@@ -82,6 +91,9 @@ int& HashTable::operator[](const string& key) {
     // stored in the slot with the key argument
     // this return is just here so the code will compile correctly
     // you will eventually replace this
+    size_t hash = hash(key);
+    int i = buckets[hash].getBucketList().get(key);
+
     return placeholder;
 }
 
@@ -91,6 +103,7 @@ int& HashTable::operator[](const string& key) {
 ///  should all be just from NORMAL slots
 vector<string> HashTable::keys() const {
     vector<string> keys;
+    for (int i = 0; i < buckets.size(); i++) {}
     return {};
 }
 
@@ -168,7 +181,7 @@ ostream& operator<<(ostream& os, const HashTable& hashTable) {
 /// empty constructor
 /// initializes the value to zero (not really necessary)
 /// and sets the bucket type to empty since start
-HashTableBucket::HashTableBucket() : value(0), type(BucketType::ESS) {
+HashTableBucket::HashTableBucket() : type(BucketType::ESS) {
 }
 
 /// parameterized constructor(key, value)
@@ -177,9 +190,7 @@ HashTableBucket::HashTableBucket() : value(0), type(BucketType::ESS) {
 /// @param k the lookup key for the bucket
 /// @param v the value associated with the key
 HashTableBucket::HashTableBucket(const string& k,
-                                 int v) : key(move(k)),
-                                          value(v),
-                                          type(BucketType::NORMAL){
+                                 int v) : type(BucketType::NORMAL){
     this->bucketList.insert(k, v);
 }
 
@@ -189,33 +200,21 @@ HashTableBucket::HashTableBucket(const string& k,
 /// bucket is marked as normal to denote it is occupied
 /// @param k new key
 /// @param v new value
-void HashTableBucket::load(const string& k, int v) {
-    key = move(k);
-    value = v;
+void HashTableBucket::load() {
+
     type = BucketType::NORMAL;
 }
 
 /// kill()
 /// clear the key and value, and mark the slot as EAR (tombstone)
+///
+/// this will run if there is only one item in the linkelist
 void HashTableBucket::kill() {
-    key.clear();
-    value = 0;
+
     type = BucketType::EAR;
 }
 
-/// getKey()
-/// get the key stored in the bucket
-/// @return the bucket's key
-string HashTableBucket::getKey() const {
-    return key;
-}
 
-/// getValue()
-/// get the value stored in the bucket
-/// @return the bucket's value
-int HashTableBucket::getValue() const {
-    return value;
-}
 bucketLinkedList HashTableBucket::getBucketList() const {
     return bucketList;
 }
@@ -350,6 +349,19 @@ void bucketLinkedList::insert(std::string k, int v) {
     }
     return false;
 }
+
+int bucketLinkedList::get(std::string k) {
+    LinkedListNode* temp = head;
+    while (temp != nullptr) {
+        if (temp->key == k) {
+            return temp->value;
+        }
+        temp = temp->next;
+    }
+    return 0;
+}
+
+
 bool bucketLinkedList::deleteKey(std::string k) {
     LinkedListNode* temp = head;
     while (temp != nullptr) {
