@@ -38,8 +38,11 @@ bool HashTable::insert(const string& key, int value) {
     if (buckets[hash].getBucketList().head == nullptr) {
         buckets[hash].load();
     }
+    if (buckets[hash].getBucketList().search(key) == false){
     buckets[hash].getBucketList().insert(key, value);
-    return {};
+        return true;
+        }
+    return false;
 }
 
 /// remove(key)
