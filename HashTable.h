@@ -115,6 +115,8 @@ public:
     // don't change this, this is required for the assignment
     static constexpr size_t DEFAULT_INITIAL_CAPACITY = 8;
     HashTableBucket buckets[DEFAULT_INITIAL_CAPACITY];
+    //this vector is mfor when the table needs to be resized
+    std::vector<HashTableBucket> table;
     HashTable(size_t initCapacity = DEFAULT_INITIAL_CAPACITY);
 
     bool insert(const std::string& key, int value);

@@ -12,6 +12,7 @@
 #include <random>
 #include <utility>
 #include <sstream>
+#include <vector>
 
 using namespace std;
 // HashTable methods
@@ -53,8 +54,8 @@ bool HashTable::remove(const string& key) {
     if (buckets[hash].getBucketList().head->next == nullptr) {
         buckets[hash].kill();
     }
-    buckets[hash].getBucketList().deleteKey(key);
-    return {};
+
+    return buckets[hash].getBucketList().deleteKey(key);
 }
 
 /// contains(key)
@@ -93,8 +94,8 @@ int& HashTable::operator[](const string& key) {
     // you will eventually replace this
     size_t hash = hash(key);
     int i = buckets[hash].getBucketList().get(key);
-
-    return placeholder;
+    int* ptr = &i;
+    return ptr[i];
 }
 
 /// keys()
@@ -103,7 +104,7 @@ int& HashTable::operator[](const string& key) {
 ///  should all be just from NORMAL slots
 vector<string> HashTable::keys() const {
     vector<string> keys;
-    for (int i = 0; i < buckets.size(); i++) {}
+    
     return {};
 }
 
