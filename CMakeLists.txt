@@ -10,5 +10,4 @@ add_executable(yourTests main.cpp
 
 add_executable(hashTableTests HashTableTests.cpp
         HashTable.cpp
-        HashTable.h
-        HashTableTests.cpp)
+        HashTable.h)

@@ -106,8 +106,16 @@ int& HashTable::operator[](const string& key) {
 ///  should all be just from NORMAL slots
 vector<string> HashTable::keys() const {
     vector<string> keys;
-    
-    return {};
+    for (int i = 0; i < std:: size(buckets); i++) {
+        if (buckets[i].getBucketList().head != nullptr) {
+            LinkedListNode* current = buckets[i].getBucketList().head;
+            while (current != nullptr) {
+                keys.push_back(current->key);
+                current = current->next;
+            }
+        }
+    }
+    return keys;
 }
 
 /// alpha()
@@ -122,7 +130,7 @@ double HashTable::alpha() const {
 /// how many buckets the table can currently hold
 /// @return the current capacity of the table
 size_t HashTable::capacity() const {
-    return {};
+    return std::size(buckets);
 }
 
 /// size()

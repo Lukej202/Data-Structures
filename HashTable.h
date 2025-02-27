@@ -29,8 +29,6 @@ public:
 
     bucketLinkedList();
 
-    ~bucketLinkedList();
-
     void insert(std::string k, int v);
 
     bool search(std::string k);
