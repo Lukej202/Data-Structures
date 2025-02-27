@@ -119,6 +119,8 @@ public:
     std::vector<HashTableBucket> table;
     HashTable(size_t initCapacity = DEFAULT_INITIAL_CAPACITY);
 
+    std::hash<std::string> hash;
+
     bool insert(const std::string& key, int value);
 
     bool remove(const std::string& key);

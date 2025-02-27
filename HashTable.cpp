@@ -33,13 +33,13 @@ HashTable::HashTable(size_t initCapacity) {
 /// @return if key is in the table, or if the table is full, return false
 /// otherwise return true
 bool HashTable::insert(const string& key, int value) {
-    size_t hash = hash(key);
+
     //if the buckets linked list was empty this sets the bucket type to normal
-    if (buckets[hash].getBucketList().head == nullptr) {
-        buckets[hash].load();
+    if (buckets[hash(key)].getBucketList().head == nullptr) {
+        buckets[hash(key)].load();
     }
-    if (buckets[hash].getBucketList().search(key) == false){
-    buckets[hash].getBucketList().insert(key, value);
+    if (buckets[hash(key)].getBucketList().search(key) == false){
+    buckets[hash(key)].getBucketList().insert(key, value);
         return true;
         }
     return false;
@@ -52,13 +52,13 @@ bool HashTable::insert(const string& key, int value) {
 /// @param key the key for the value to be removed
 /// @return true if the key was found and removed, otherwise false
 bool HashTable::remove(const string& key) {
-    size_t hash = hash(key);
+
     //sets the bucket to EAR if the Linked list in the bucket only has one item
-    if (buckets[hash].getBucketList().head->next == nullptr) {
-        buckets[hash].kill();
+    if (buckets[hash(key)].getBucketList().head->next == nullptr) {
+        buckets[hash(key)].kill();
     }
 
-    return buckets[hash].getBucketList().deleteKey(key);
+    return buckets[hash(key)].getBucketList().deleteKey(key);
 }
 
 /// contains(key)
@@ -66,9 +66,8 @@ bool HashTable::remove(const string& key) {
 /// @param key the key to be searched for
 /// @return true if given key is in the table, otherwise false
 bool HashTable::contains(const string& key) const {
-    size_t hash = hash(key);
 
-    return buckets[hash].getBucketList().search(key);
+    return buckets[hash(key)].getBucketList().search(key);
 }
 
 /// get(key)
@@ -77,8 +76,8 @@ bool HashTable::contains(const string& key) const {
 /// @return the value associated with the key, if the key is not
 /// in the table find returns nullopt
 optional<int> HashTable::get(const string& key) const {
-    size_t hash = hash(key);
-    return  buckets[hash].getBucketList().get(key);
+
+    return  buckets[hash(key)].getBucketList().get(key);
 }
 
 /// operator[key]
@@ -95,8 +94,8 @@ int& HashTable::operator[](const string& key) {
     // stored in the slot with the key argument
     // this return is just here so the code will compile correctly
     // you will eventually replace this
-    size_t hash = hash(key);
-    int i = buckets[hash].getBucketList().get(key);
+
+    int i = buckets[hash(key)].getBucketList().get(key);
     int* ptr = &i;
     return ptr[i];
 }
@@ -264,13 +263,7 @@ bool HashTableBucket::isEmptyAfterRemoval() const {
 /// @return a string with the key and value
 /// if bucket is empty, string is: "[empty]"
 string HashTableBucket::toString() const {
-    stringstream result;
-    if (isEmpty()) {
-        result << "[empty]";
-    } else {
-        result << "<" << key << ", " << value << ">";
-    }
-    return result.str();
+    return {};
 }
 
 /// format the bucket's contents to a string
