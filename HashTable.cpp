@@ -35,11 +35,11 @@ HashTable::HashTable(size_t initCapacity) {
 bool HashTable::insert(const string& key, int value) {
 
     //if the buckets linked list was empty this sets the bucket type to normal
-    if (buckets[hash(key)].getBucketList().head == nullptr) {
-        buckets[hash(key)].load();
+    if (buckets[key.length() % std::size(buckets)].getBucketList().head == nullptr) {
+        buckets[key.length() % std::size(buckets)].load();
     }
-    if (buckets[hash(key)].getBucketList().search(key) == false){
-    buckets[hash(key)].getBucketList().insert(key, value);
+    if (buckets[key.length() % std::size(buckets)].getBucketList().search(key) == false){
+    buckets[key.length() % std::size(buckets)].getBucketList().insert(key, value);
         return true;
         }
     return false;
@@ -54,11 +54,11 @@ bool HashTable::insert(const string& key, int value) {
 bool HashTable::remove(const string& key) {
 
     //sets the bucket to EAR if the Linked list in the bucket only has one item
-    if (buckets[hash(key)].getBucketList().head->next == nullptr) {
-        buckets[hash(key)].kill();
+    if (buckets[key.length() % std::size(buckets)].getBucketList().head->next == nullptr) {
+        buckets[key.length() % std::size(buckets)].kill();
     }
 
-    return buckets[hash(key)].getBucketList().deleteKey(key);
+    return buckets[key.length() % std::size(buckets)].getBucketList().deleteKey(key);
 }
 
 /// contains(key)
@@ -67,7 +67,7 @@ bool HashTable::remove(const string& key) {
 /// @return true if given key is in the table, otherwise false
 bool HashTable::contains(const string& key) const {
 
-    return buckets[hash(key)].getBucketList().search(key);
+    return buckets[key.length() % std::size(buckets)].getBucketList().search(key);
 }
 
 /// get(key)
@@ -77,7 +77,7 @@ bool HashTable::contains(const string& key) const {
 /// in the table find returns nullopt
 optional<int> HashTable::get(const string& key) const {
 
-    return  buckets[hash(key)].getBucketList().get(key);
+    return  buckets[key.length() % std::size(buckets)].getBucketList().get(key);
 }
 
 /// operator[key]
@@ -95,7 +95,7 @@ int& HashTable::operator[](const string& key) {
     // this return is just here so the code will compile correctly
     // you will eventually replace this
 
-    int i = buckets[hash(key)].getBucketList().get(key);
+    int i = buckets[key.length() % std::size(buckets)].getBucketList().get(key);
     int* ptr = &i;
     return ptr[i];
 }
@@ -201,8 +201,13 @@ vector<size_t> HashTable::makeShuffledVector(size_t N) {
 /// @param hashTable the hash table to print
 /// @return reference to the ostream
 ostream& operator<<(ostream& os, const HashTable& hashTable) {
+    for (int i = 0; i < hashTable.size(); i++) {
+        if (hashTable.buckets[i].getBucketList().head != nullptr) {
+            
+        }
+    }
     return os;
-}
+    }
 
 /******************************************************
  **************    HashTableBucket    *****************
@@ -399,5 +404,13 @@ bool bucketLinkedList::deleteKey(std::string k) {
         }
     }
     return false;
+}
+
+void bucketLinkedList::Print() {
+    LinkedListNode* temp = head;
+    while (temp != nullptr) {
+        cout << "<" << temp->key << temp->value << ">" << endl;
+        temp = temp->next;
+    }
 }
 
