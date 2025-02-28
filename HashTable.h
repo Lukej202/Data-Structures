@@ -29,6 +29,8 @@ public:
 
     bucketLinkedList();
 
+    ~bucketLinkedList();
+
     void insert(std::string k, int v);
 
     bool search(std::string k);
@@ -36,6 +38,8 @@ public:
     int get(std::string k);
 
     bool deleteKey(std::string k);
+
+    int size() const;
 
     void Print();
 };
@@ -113,8 +117,8 @@ public:
     // don't change this, this is required for the assignment
     static constexpr size_t DEFAULT_INITIAL_CAPACITY = 8;
     HashTableBucket buckets[DEFAULT_INITIAL_CAPACITY];
-    //this vector is mfor when the table needs to be resized
-    std::vector<HashTableBucket> table;
+    //this vector is for when the table needs to be resized
+    std::vector<LinkedListNode> table;
     HashTable(size_t initCapacity = DEFAULT_INITIAL_CAPACITY);
 
     std::hash<std::string> hash;

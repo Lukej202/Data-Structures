@@ -34,10 +34,10 @@ HashTable::HashTable(size_t initCapacity) {
 /// otherwise return true
 bool HashTable::insert(const string& key, int value) {
 
-    //if the buckets linked list was empty this sets the bucket type to normal
-    if (buckets[key.length() % std::size(buckets)].getBucketList().head == nullptr) {
-        buckets[key.length() % std::size(buckets)].load();
+    if (buckets[key.length() % std::size(buckets)].getBucketList().size() == 3) {
+        this->resizeTable();
     }
+
     if (buckets[key.length() % std::size(buckets)].getBucketList().search(key) == false){
     buckets[key.length() % std::size(buckets)].getBucketList().insert(key, value);
         return true;
@@ -168,6 +168,7 @@ size_t HashTable::size() const {
 /// all the elements remain in the table, and will need to be re-hashed based on the new capacity
 /// @param resizeFactor how much to resize the table by
 void HashTable::resizeTable(double resizeFactor) {
+
 }
 
 /// makeShuffledVector is provided for you
@@ -351,6 +352,16 @@ bucketLinkedList::bucketLinkedList() {
     tail = nullptr;
 }
 
+bucketLinkedList::~bucketLinkedList() {
+    LinkedListNode* current = head;
+    while (current != nullptr) {
+        LinkedListNode* next = current->next;
+        delete current;
+        current = next;
+    }
+}
+
+
 void bucketLinkedList::insert(std::string k, int v) {
     LinkedListNode* newNode = new LinkedListNode(k, v);
     if (head == nullptr) {
@@ -404,6 +415,16 @@ bool bucketLinkedList::deleteKey(std::string k) {
         }
     }
     return false;
+}
+
+int bucketLinkedList::size() const {
+    LinkedListNode* temp = head;
+    int count = 0;
+    while (temp != nullptr) {
+        count++;
+        temp = temp->next;
+    }
+    return count;
 }
 
 void bucketLinkedList::Print() {
