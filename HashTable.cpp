@@ -123,7 +123,18 @@ vector<string> HashTable::keys() const {
 /// number of elements / table capacity
 /// @return the current alpha/load factor
 double HashTable::alpha() const {
-    return {};
+    int count = 0;
+    for (int i = 0; i < std:: size(buckets); i++) {
+        if (buckets[i].getBucketList().head != nullptr) {
+            LinkedListNode* current = buckets[i].getBucketList().head;
+            while (current != nullptr) {
+                count += 1;
+                current = current->next;
+            }
+        }
+    }
+    int alpha = count / std:: size(buckets);
+    return alpha;
 }
 
 /// capacity()
@@ -138,7 +149,17 @@ size_t HashTable::capacity() const {
 /// alternatively, how many buckets are NORMAL
 /// @return number of elements currently in the table
 size_t HashTable::size() const {
-    return {};
+    int count = 0;
+    for (int i = 0; i < std:: size(buckets); i++) {
+        if (buckets[i].getBucketList().head != nullptr) {
+            LinkedListNode* current = buckets[i].getBucketList().head;
+            while (current != nullptr) {
+                count += 1;
+                current = current->next;
+            }
+        }
+    }
+    return count;
 }
 
 /// resizeTable(factor)
