@@ -20,29 +20,29 @@ public:
     int value;
     LinkedListNode* next;
 
-    LinkedListNode(std::string k, int v);;
+    LinkedListNode(const std::string &k, int v);;
 };
-class bucketLinkedList {
-public:
-    LinkedListNode* head;
-    LinkedListNode* tail;
-
-    bucketLinkedList();
-
-    ~bucketLinkedList();
-
-    void insert(std::string k, int v);
-
-    bool search(std::string k);
-
-    int get(std::string k);
-
-    bool deleteKey(std::string k);
-
-    int size() const;
-
-    void Print();
-};
+// class bucketLinkedList {
+// public:
+//     LinkedListNode* head;
+//     LinkedListNode* tail;
+//
+//     bucketLinkedList();
+//
+//     ~bucketLinkedList();
+//
+//     void insert(const std::string& k, int v);
+//
+//     bool search(const std::string& k) const;
+//
+//     int get(const std::string& k) const;
+//
+//     bool deleteKey(const std::string& k) const;
+//
+//     int size() const;
+//
+//     void Print() const;
+// };
 
 /// enum BucketType
 /// NORMAL: bucket is currently occipied with a valid key/value
@@ -59,18 +59,29 @@ enum class BucketType { NORMAL, ESS, EAR };
 /// instead of a bucket holding a value and a key it holds a linked list each node has a value and a key
 class HashTableBucket {
 public:
-    bucketLinkedList bucketList;
     BucketType type;
+    LinkedListNode* head{};
+    LinkedListNode* tail{};
 
     HashTableBucket();
 
-    HashTableBucket(const std::string& k, int v);
+    ~HashTableBucket();
+
+    void insert(const std::string& k, int v);
+
+    bool search(const std::string& k) const;
+
+    int get(const std::string& k) const;
+
+    bool deleteNode(const std::string &k);
+
+    int size() const;
+
+    void Print() const;
 
     void load();
 
     void kill();
-
-    bucketLinkedList getBucketList() const;
 
     BucketType getType() const;
 
@@ -110,6 +121,9 @@ private:
     // you may want a private method to resize your table
     void resizeTable(double resizeFactor = 2.0);
 
+    //this vector is for when the table needs to be resized
+    std::vector<LinkedListNode> table;
+
     // you can eventually remove this if you want, it is
     // temporarily here so operator[] will "work"
     int placeholder;
@@ -117,8 +131,6 @@ public:
     // don't change this, this is required for the assignment
     static constexpr size_t DEFAULT_INITIAL_CAPACITY = 8;
     HashTableBucket buckets[DEFAULT_INITIAL_CAPACITY];
-    //this vector is for when the table needs to be resized
-    std::vector<LinkedListNode> table;
     HashTable(size_t initCapacity = DEFAULT_INITIAL_CAPACITY);
 
     std::hash<std::string> hash;

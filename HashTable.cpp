@@ -33,15 +33,15 @@ HashTable::HashTable(size_t initCapacity) {
 /// @return if key is in the table, or if the table is full, return false
 /// otherwise return true
 bool HashTable::insert(const string& key, int value) {
+    // if (buckets[key.length() % std::size(buckets)].getBucketList().size() == 3) {
+    //     this->resizeTable();
+    // }
 
-    if (buckets[key.length() % std::size(buckets)].getBucketList().size() == 3) {
-        this->resizeTable();
-    }
-
-    if (buckets[key.length() % std::size(buckets)].getBucketList().search(key) == false){
-    buckets[key.length() % std::size(buckets)].getBucketList().insert(key, value);
+    if (buckets[key.length() % std::size(buckets)].search(key) == false){
+        buckets[key.length() % std::size(buckets)].insert(key, value);
         return true;
-        }
+     }
+
     return false;
 }
 
@@ -53,12 +53,7 @@ bool HashTable::insert(const string& key, int value) {
 /// @return true if the key was found and removed, otherwise false
 bool HashTable::remove(const string& key) {
 
-    //sets the bucket to EAR if the Linked list in the bucket only has one item
-    if (buckets[key.length() % std::size(buckets)].getBucketList().head->next == nullptr) {
-        buckets[key.length() % std::size(buckets)].kill();
-    }
-
-    return buckets[key.length() % std::size(buckets)].getBucketList().deleteKey(key);
+    return buckets[key.length() % std::size(buckets)].deleteNode(key);
 }
 
 /// contains(key)
@@ -67,7 +62,7 @@ bool HashTable::remove(const string& key) {
 /// @return true if given key is in the table, otherwise false
 bool HashTable::contains(const string& key) const {
 
-    return buckets[key.length() % std::size(buckets)].getBucketList().search(key);
+    return buckets[key.length() % std::size(buckets)].search(key);
 }
 
 /// get(key)
@@ -77,7 +72,7 @@ bool HashTable::contains(const string& key) const {
 /// in the table find returns nullopt
 optional<int> HashTable::get(const string& key) const {
 
-    return  buckets[key.length() % std::size(buckets)].getBucketList().get(key);
+    return  buckets[key.length() % std::size(buckets)].get(key);
 }
 
 /// operator[key]
@@ -95,7 +90,7 @@ int& HashTable::operator[](const string& key) {
     // this return is just here so the code will compile correctly
     // you will eventually replace this
 
-    int i = buckets[key.length() % std::size(buckets)].getBucketList().get(key);
+    int i = buckets[key.length() % std::size(buckets)].get(key);
     int* ptr = &i;
     return ptr[i];
 }
@@ -107,8 +102,8 @@ int& HashTable::operator[](const string& key) {
 vector<string> HashTable::keys() const {
     vector<string> keys;
     for (int i = 0; i < std:: size(buckets); i++) {
-        if (buckets[i].getBucketList().head != nullptr) {
-            LinkedListNode* current = buckets[i].getBucketList().head;
+        if (buckets[i].head != nullptr) {
+            LinkedListNode* current = buckets[i].head;
             while (current != nullptr) {
                 keys.push_back(current->key);
                 current = current->next;
@@ -125,8 +120,8 @@ vector<string> HashTable::keys() const {
 double HashTable::alpha() const {
     int count = 0;
     for (int i = 0; i < std:: size(buckets); i++) {
-        if (buckets[i].getBucketList().head != nullptr) {
-            LinkedListNode* current = buckets[i].getBucketList().head;
+        if (buckets[i].head != nullptr) {
+            LinkedListNode* current = buckets[i].head;
             while (current != nullptr) {
                 count += 1;
                 current = current->next;
@@ -151,8 +146,8 @@ size_t HashTable::capacity() const {
 size_t HashTable::size() const {
     int count = 0;
     for (int i = 0; i < std:: size(buckets); i++) {
-        if (buckets[i].getBucketList().head != nullptr) {
-            LinkedListNode* current = buckets[i].getBucketList().head;
+        if (buckets[i].head != nullptr) {
+            LinkedListNode* current = buckets[i].head;
             while (current != nullptr) {
                 count += 1;
                 current = current->next;
@@ -203,8 +198,8 @@ vector<size_t> HashTable::makeShuffledVector(size_t N) {
 /// @return reference to the ostream
 ostream& operator<<(ostream& os, const HashTable& hashTable) {
     for (int i = 0; i < hashTable.size(); i++) {
-        if (hashTable.buckets[i].getBucketList().head != nullptr) {
-            
+        if (hashTable.buckets[i].head != nullptr) {
+
         }
     }
     return os;
@@ -220,18 +215,96 @@ ostream& operator<<(ostream& os, const HashTable& hashTable) {
 /// initializes the value to zero (not really necessary)
 /// and sets the bucket type to empty since start
 HashTableBucket::HashTableBucket() : type(BucketType::ESS) {
+    head = nullptr;
+    tail = nullptr;
 }
 
-/// parameterized constructor(key, value)
-/// creates a new bucket with the given key and value
-/// the bucket is marked as normal
-/// @param k the lookup key for the bucket
-/// @param v the value associated with the key
-HashTableBucket::HashTableBucket(const string& k,
-                                 int v) : type(BucketType::NORMAL){
-    this->bucketList.insert(k, v);
+HashTableBucket::~HashTableBucket() {
+    LinkedListNode* current = head;
+    while (current != nullptr) {
+        LinkedListNode* next = current->next;
+        delete current;
+        current = next;
+    }
 }
 
+void HashTableBucket::insert(const std::string& k, const int v) {
+    LinkedListNode* newNode = new LinkedListNode(k, v);
+    if (head == nullptr) {
+        head = newNode;
+        tail = newNode;
+    }
+    else {
+        tail->next = newNode;
+        tail = newNode;
+    }
+}
+
+bool HashTableBucket::search(const std::string& k) const {
+   LinkedListNode* current = head;
+    while (current != nullptr) {
+        if (current->key == k) {
+            return true;
+        }
+        current = current->next;
+    }
+    return false;
+}
+
+int HashTableBucket::get(const std::string& k) const {
+    LinkedListNode* temp = head;
+    while (temp != nullptr) {
+        if (temp->key == k) {
+            return temp->value;
+        }
+        temp = temp->next;
+    }
+    return 0;
+}
+
+
+bool HashTableBucket::deleteNode(const std::string& k) {
+    LinkedListNode* current = head;
+    LinkedListNode* previous = nullptr;
+    if (head == nullptr) {
+        return false;
+    }
+    if (head->key == k) {
+        head == head->next;
+        return true;
+    }
+    while (current != nullptr) {
+        if (current->key == k) {
+            if (current == tail) {
+                tail = previous;
+                return true;
+            }
+            current = current->next;
+            return true;
+        }
+        previous = current;
+        current = current->next;
+    }
+    return false;
+}
+
+int HashTableBucket::size() const {
+    LinkedListNode* temp = head;
+    int count = 0;
+    while (temp != nullptr) {
+        count++;
+        temp = temp->next;
+    }
+    return count;
+}
+
+void HashTableBucket::Print() const {
+    LinkedListNode* temp = head;
+    while (temp != nullptr) {
+        cout << "<" << temp->key << temp->value << ">" << endl;
+        temp = temp->next;
+    }
+}
 
 /// load(key, value)
 /// update the key and value stored in the bucket
@@ -253,9 +326,6 @@ void HashTableBucket::kill() {
 }
 
 
-bucketLinkedList HashTableBucket::getBucketList() const {
-    return bucketList;
-}
 /// getType()
 /// get the current type of the bucket
 /// @return the bucket's type (NORMAL, ESS, EAR)
@@ -341,97 +411,98 @@ ostream& operator<<(ostream& os, pair<const HashTableBucket&,  size_t> bucket) {
 }
 
 // Linked List stuff for chaining
-LinkedListNode::LinkedListNode(std::string k, int v) {
-    key = k;
-    value = v;
+LinkedListNode::LinkedListNode(const std::string &k, const int v) {
+    this->key = k;
+    this->value = v;
     next = nullptr;
 }
 
-bucketLinkedList::bucketLinkedList() {
-    head = nullptr;
-    tail = nullptr;
-}
-
-bucketLinkedList::~bucketLinkedList() {
-    LinkedListNode* current = head;
-    while (current != nullptr) {
-        LinkedListNode* next = current->next;
-        delete current;
-        current = next;
-    }
-}
-
-
-void bucketLinkedList::insert(std::string k, int v) {
-    LinkedListNode* newNode = new LinkedListNode(k, v);
-    if (head == nullptr) {
-       head = newNode;
-        tail = newNode;
-        delete newNode;
-        return;
-    }
-    LinkedListNode* temp = head;
-    while (temp != nullptr) {
-        if (temp->next == nullptr) {
-            temp->next = newNode;
-            delete newNode;
-            delete temp;
-            return;
-        }else {
-            temp = temp->next;
-        }
-    }
-}
- bool bucketLinkedList::search(std::string k) {
-    LinkedListNode* temp = head;
-    while (temp != nullptr) {
-        if (temp->key == k) {
-            return true;
-        }
-    }
-    return false;
-}
-
-int bucketLinkedList::get(std::string k) {
-    LinkedListNode* temp = head;
-    while (temp != nullptr) {
-        if (temp->key == k) {
-            return temp->value;
-        }
-        temp = temp->next;
-    }
-    return 0;
-}
-
-
-bool bucketLinkedList::deleteKey(std::string k) {
-    LinkedListNode* temp = head;
-    while (temp != nullptr) {
-        if (temp->next->key == k) {
-            temp->next = temp->next->next;
-            return true;
-        }else {
-            temp = temp->next;
-        }
-    }
-    return false;
-}
-
-int bucketLinkedList::size() const {
-    LinkedListNode* temp = head;
-    int count = 0;
-    while (temp != nullptr) {
-        count++;
-        temp = temp->next;
-    }
-    return count;
-}
-
-void bucketLinkedList::Print() {
-    LinkedListNode* temp = head;
-    while (temp != nullptr) {
-        cout << "<" << temp->key << temp->value << ">" << endl;
-        temp = temp->next;
-    }
-}
-
+// bucketLinkedList::bucketLinkedList() {
+//     head = nullptr;
+//     tail = nullptr;
+// }
+//
+// bucketLinkedList::~bucketLinkedList() {
+//     LinkedListNode* current = head;
+//     while (current != nullptr) {
+//         LinkedListNode* next = current->next;
+//         delete current;
+//         current = next;
+//     }
+// }
+//
+//
+// void bucketLinkedList::insert(const std::string& k, const int v) {
+//     auto* newNode = new LinkedListNode(k, v);
+//     if (head == nullptr) {
+//        head = newNode;
+//         tail = newNode;
+//         delete newNode;
+//         return;
+//     }
+//     LinkedListNode* temp = head;
+//     while (temp != nullptr) {
+//         if (temp->next == nullptr) {
+//             temp->next = newNode;
+//             delete newNode;
+//             delete temp;
+//             return;
+//         }else {
+//             temp = temp->next;
+//         }
+//     }
+// }
+//  bool bucketLinkedList::search(const std::string& k) const {
+//     LinkedListNode* temp = head;
+//     while (temp != nullptr) {
+//         if (temp->key == k) {
+//             delete temp;
+//             return true;
+//         }
+//         temp = temp->next;
+//     }
+//     return false;
+// }
+//
+// int bucketLinkedList::get(const std::string& k) const {
+//     LinkedListNode* temp = head;
+//     while (temp != nullptr) {
+//         if (temp->key == k) {
+//             return temp->value;
+//         }
+//         temp = temp->next;
+//     }
+//     return 0;
+// }
+//
+//
+// bool bucketLinkedList::deleteKey(const std::string& k) const {
+//     LinkedListNode* temp = head;
+//     while (temp != nullptr) {
+//         if (temp->next->key == k) {
+//             temp->next = temp->next->next;
+//             return true;
+//         }else {
+//             temp = temp->next;
+//         }
+//     }
+//     return false;
+// }
+//
+// int bucketLinkedList::size() const {
+//     LinkedListNode* temp = head;
+//     int count = 0;
+//     while (temp != nullptr) {
+//         count++;
+//         temp = temp->next;
+//     }
+//     return count;
+// }
+//
+// void bucketLinkedList::Print() const {
+//     LinkedListNode* temp = head;
+//     while (temp != nullptr) {
+//         cout << "<" << temp->key << temp->value << ">" << endl;
+//         temp = temp->next;
+//     }
+// }
