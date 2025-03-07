@@ -21,6 +21,7 @@ using namespace std;
 /// You can create a hashtable without passing any parameters
 /// @param size the initial capacity of the hash table
 HashTable::HashTable(size_t initCapacity) {
+
     for (int i = 0; i < initCapacity; i++) {
         buckets[i] = HashTableBucket();
     }
@@ -91,8 +92,8 @@ int& HashTable::operator[](const string& key) {
     // you will eventually replace this
 
     int i = buckets[key.length() % std::size(buckets)].get(key);
-    int* ptr = &i;
-    return ptr[i];
+    int& ref = i;
+    return ref;
 }
 
 /// keys()
@@ -118,7 +119,7 @@ vector<string> HashTable::keys() const {
 /// number of elements / table capacity
 /// @return the current alpha/load factor
 double HashTable::alpha() const {
-    int count = 0;
+    double count = 0;
     for (int i = 0; i < std:: size(buckets); i++) {
         if (buckets[i].head != nullptr) {
             LinkedListNode* current = buckets[i].head;
@@ -128,7 +129,7 @@ double HashTable::alpha() const {
             }
         }
     }
-    int alpha = count / std:: size(buckets);
+    double alpha = count / std::size(buckets);
     return alpha;
 }
 
@@ -163,7 +164,7 @@ size_t HashTable::size() const {
 /// all the elements remain in the table, and will need to be re-hashed based on the new capacity
 /// @param resizeFactor how much to resize the table by
 void HashTable::resizeTable(double resizeFactor) {
-
+    
 }
 
 /// makeShuffledVector is provided for you
@@ -197,11 +198,16 @@ vector<size_t> HashTable::makeShuffledVector(size_t N) {
 /// @param hashTable the hash table to print
 /// @return reference to the ostream
 ostream& operator<<(ostream& os, const HashTable& hashTable) {
-    for (int i = 0; i < hashTable.size(); i++) {
-        if (hashTable.buckets[i].head != nullptr) {
 
-        }
-    }
+    // for (int i = 0; i < hashTable.size(); i++) {
+    //     LinkedListNode* current = hashTable.buckets[i].head;
+    //     while (current != nullptr) {
+    //         if (hashTable.buckets[i].head != nullptr) {
+    //             os << "< "<< current->key << current->value << ">" << endl;
+    //             current = current->next;
+    //         }
+    //     }
+    // }
     return os;
     }
 
@@ -266,26 +272,24 @@ int HashTableBucket::get(const std::string& k) const {
 bool HashTableBucket::deleteNode(const std::string& k) {
     LinkedListNode* current = head;
     LinkedListNode* previous = nullptr;
-    if (head == nullptr) {
-        return false;
-    }
-    if (head->key == k) {
-        head == head->next;
-        return true;
-    }
     while (current != nullptr) {
         if (current->key == k) {
-            if (current == tail) {
-                tail = previous;
+            if (previous == nullptr) {
+                head = current->next;
+                tail = current;
                 return true;
             }
-            current = current->next;
-            return true;
+            else {
+                previous->next = current->next;
+                delete current;
+                return true;
+            }
         }
         previous = current;
         current = current->next;
     }
     return false;
+
 }
 
 int HashTableBucket::size() const {
@@ -298,13 +302,6 @@ int HashTableBucket::size() const {
     return count;
 }
 
-void HashTableBucket::Print() const {
-    LinkedListNode* temp = head;
-    while (temp != nullptr) {
-        cout << "<" << temp->key << temp->value << ">" << endl;
-        temp = temp->next;
-    }
-}
 
 /// load(key, value)
 /// update the key and value stored in the bucket
@@ -417,92 +414,3 @@ LinkedListNode::LinkedListNode(const std::string &k, const int v) {
     next = nullptr;
 }
 
-// bucketLinkedList::bucketLinkedList() {
-//     head = nullptr;
-//     tail = nullptr;
-// }
-//
-// bucketLinkedList::~bucketLinkedList() {
-//     LinkedListNode* current = head;
-//     while (current != nullptr) {
-//         LinkedListNode* next = current->next;
-//         delete current;
-//         current = next;
-//     }
-// }
-//
-//
-// void bucketLinkedList::insert(const std::string& k, const int v) {
-//     auto* newNode = new LinkedListNode(k, v);
-//     if (head == nullptr) {
-//        head = newNode;
-//         tail = newNode;
-//         delete newNode;
-//         return;
-//     }
-//     LinkedListNode* temp = head;
-//     while (temp != nullptr) {
-//         if (temp->next == nullptr) {
-//             temp->next = newNode;
-//             delete newNode;
-//             delete temp;
-//             return;
-//         }else {
-//             temp = temp->next;
-//         }
-//     }
-// }
-//  bool bucketLinkedList::search(const std::string& k) const {
-//     LinkedListNode* temp = head;
-//     while (temp != nullptr) {
-//         if (temp->key == k) {
-//             delete temp;
-//             return true;
-//         }
-//         temp = temp->next;
-//     }
-//     return false;
-// }
-//
-// int bucketLinkedList::get(const std::string& k) const {
-//     LinkedListNode* temp = head;
-//     while (temp != nullptr) {
-//         if (temp->key == k) {
-//             return temp->value;
-//         }
-//         temp = temp->next;
-//     }
-//     return 0;
-// }
-//
-//
-// bool bucketLinkedList::deleteKey(const std::string& k) const {
-//     LinkedListNode* temp = head;
-//     while (temp != nullptr) {
-//         if (temp->next->key == k) {
-//             temp->next = temp->next->next;
-//             return true;
-//         }else {
-//             temp = temp->next;
-//         }
-//     }
-//     return false;
-// }
-//
-// int bucketLinkedList::size() const {
-//     LinkedListNode* temp = head;
-//     int count = 0;
-//     while (temp != nullptr) {
-//         count++;
-//         temp = temp->next;
-//     }
-//     return count;
-// }
-//
-// void bucketLinkedList::Print() const {
-//     LinkedListNode* temp = head;
-//     while (temp != nullptr) {
-//         cout << "<" << temp->key << temp->value << ">" << endl;
-//         temp = temp->next;
-//     }
-// }

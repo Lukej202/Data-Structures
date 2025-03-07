@@ -22,27 +22,7 @@ public:
 
     LinkedListNode(const std::string &k, int v);;
 };
-// class bucketLinkedList {
-// public:
-//     LinkedListNode* head;
-//     LinkedListNode* tail;
-//
-//     bucketLinkedList();
-//
-//     ~bucketLinkedList();
-//
-//     void insert(const std::string& k, int v);
-//
-//     bool search(const std::string& k) const;
-//
-//     int get(const std::string& k) const;
-//
-//     bool deleteKey(const std::string& k) const;
-//
-//     int size() const;
-//
-//     void Print() const;
-// };
+
 
 /// enum BucketType
 /// NORMAL: bucket is currently occipied with a valid key/value
@@ -77,8 +57,6 @@ public:
 
     int size() const;
 
-    void Print() const;
-
     void load();
 
     void kill();
@@ -111,7 +89,6 @@ private:
 
 
 
-
     // if using pseudo-random probing, you will need an offsets array
     // I'm also providing a method to make the shuffled vector
     // and a method to generate an offsets array
@@ -121,18 +98,14 @@ private:
     // you may want a private method to resize your table
     void resizeTable(double resizeFactor = 2.0);
 
-    //this vector is for when the table needs to be resized
-    std::vector<LinkedListNode> table;
-
     // you can eventually remove this if you want, it is
     // temporarily here so operator[] will "work"
     int placeholder;
 public:
     // don't change this, this is required for the assignment
     static constexpr size_t DEFAULT_INITIAL_CAPACITY = 8;
-    HashTableBucket buckets[DEFAULT_INITIAL_CAPACITY];
     HashTable(size_t initCapacity = DEFAULT_INITIAL_CAPACITY);
-
+    HashTableBucket buckets[DEFAULT_INITIAL_CAPACITY];
     std::hash<std::string> hash;
 
     bool insert(const std::string& key, int value);

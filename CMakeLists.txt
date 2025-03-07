@@ -5,10 +5,11 @@ set(CMAKE_CXX_STANDARD 20)
 
 add_executable(yourTests main.cpp
         HashTable.cpp
-        HashTable.h
-        tests.cpp)
+        HashTable.h)
 
 
 add_executable(hashTableTests HashTableTests.cpp
         HashTable.cpp
-        HashTable.h)
+        HashTable.h
+        HashTableTests.cpp
+        HashTableTests.cpp)
