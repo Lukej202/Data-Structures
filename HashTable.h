@@ -24,6 +24,8 @@ public:
 };
 
 
+
+
 /// enum BucketType
 /// NORMAL: bucket is currently occipied with a valid key/value
 /// ESS: bucket has empty since start (has never had a key/value)
@@ -47,13 +49,19 @@ public:
 
     ~HashTableBucket();
 
+    void listInsert(const std::string &k, int v);
+
     void insert(const std::string& k, int v);
 
     bool search(const std::string& k) const;
 
+    int listGet(const std::string &k) const;
+
     int get(const std::string& k) const;
 
     bool deleteNode(const std::string &k);
+
+    int listSize() const;
 
     int size() const;
 
@@ -88,7 +96,6 @@ private:
     // you may also want a method for your chosen probe function
 
 
-
     // if using pseudo-random probing, you will need an offsets array
     // I'm also providing a method to make the shuffled vector
     // and a method to generate an offsets array
@@ -105,8 +112,13 @@ public:
     // don't change this, this is required for the assignment
     static constexpr size_t DEFAULT_INITIAL_CAPACITY = 8;
     HashTable(size_t initCapacity = DEFAULT_INITIAL_CAPACITY);
-    HashTableBucket buckets[DEFAULT_INITIAL_CAPACITY];
-    std::hash<std::string> hash;
+    //this vector is going to hold key value pairs for table resizeing
+    std::vector<HashTableBucket> buckets;
+
+
+
+    //this is a method to give a bucket to put a key and vaulue to
+    static int hash(const std::string& k, int size);
 
     bool insert(const std::string& key, int value);
 

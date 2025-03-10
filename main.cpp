@@ -7,9 +7,12 @@ using namespace std;
 
 int main() {
     HashTable ht;
-    ht.insert("Luke", 26);
-    ht.insert("Bob", 22);
-    ht.insert("Rob", 27);
-    ht.remove("Bob");
+    ht.insert("3", 26);
+    ht.insert("22", 22);
+    ht.insert("2", 27);
+    ht.insert("8", 28);
+    ht.insert("16", 29);
+    ht.insert("24", 30);
+
     return 0;
 }
