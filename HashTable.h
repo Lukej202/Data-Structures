@@ -57,7 +57,7 @@ public:
 
     int listGet(const std::string &k) const;
 
-    int get(const std::string& k) const;
+    [[nodiscard]] int& getRef(const std::string& k) const;
 
     bool deleteNode(const std::string &k);
 
