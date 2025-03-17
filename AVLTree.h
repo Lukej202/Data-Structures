@@ -11,14 +11,16 @@
 using namespace std;
 
 class AVLNode {
-    public:
+public:
     string key;
+    int value;
     int height;
     AVLNode *left;
     AVLNode *right;
 
-    AVLNode(string k, int h) {
+    AVLNode(string k, int v, int h) {
         key = k;
+        value = v;
         height = h;
         left = nullptr;
         right = nullptr;
@@ -32,6 +34,10 @@ class AVLNode {
         right = r;
     }
 
+    void setHeight(int h) {
+        height = h;
+    }
+
     int findHeight(AVLNode *node);
 
     int numChildren(AVLNode *node);
@@ -41,17 +47,22 @@ class AVLNode {
 
 class AVLTree {
 
-    public:
+public:
+    AVLNode *root;
 
     AVLTree();
 
-    ~AVLTree();
+    //~AVLTree();
 
     bool insert(const string& key, int value);
 
+    void insertHelper(AVLNode* current, AVLNode* insertNode);
+
     bool remove(const string& key);
 
-    bool contains(const string& key) const;
+    bool contains(string &key) const;
+
+    bool containsHelper(const AVLNode *node, string &key) const;
 
     optional<int> get(const string& key) const;
 
@@ -65,11 +76,11 @@ class AVLTree {
 
     size_t getHeight() const;
 
-    ostream& operator<<(ostream& os, const AVLTree & avltree) const;
+    //ostream& operator<<(ostream& os, const AVLTree & avltree) const;
 
     AVLTree(const AVLTree& other);
 
-    void operator=(const AVLTree& other);
+    //void operator=(const AVLTree& other);
 
 };
 
