@@ -75,8 +75,10 @@ public:
 class AVLNodeVectorVisit : public AVLNodeVisitor {
     public:
     vector<string> keys;
+    vector<int> values;
     void visit(AVLNode *node) override{
         keys.push_back(node->key);
+        values.push_back(node->value);
     }
 };
 
@@ -113,7 +115,7 @@ public:
 
     int& overLoadOneHelper(const string& key, AVLNode *node);
 
-    vector<string> findRange(string lowKey, string highKey) const;
+    vector<int> findRange(string lowKey, string highKey) const;
 
     void findRangeHelper(AVLNode *node, AVLNodeVisitor& visitor, string lowKey, string highKey) const;
 
@@ -131,16 +133,32 @@ public:
 
     //void operator=(const AVLTree& other);
 
-    void leftRotate(AVLNode*& current) {
-
+    void updateBalances(AVLNode *node) {
+        if (node == nullptr) {
+            return;
+        }
+        updateBalances(node->left);
+        node->getBalance(node);
+        updateBalances(node->right);
     }
 
-    void rightRotate(AVLNode*& current) {
-        AVLNode* problemNode;
-        
-
+    void checkBalnces(AVLNode *node) {
+        if (node == nullptr) {
+            return;
+        }
+        checkBalnces(node->left);
+        if (node->balance > 1 || node->balance < -1) {
+            this->Rotate(node);
+        }
+        checkBalnces(node->right);
     }
 
+    void Rotate(AVLNode*& problemNode) {
+        AVLNode* hook = problemNode->right;
+        AVLNode* newNode = new AVLNode(problemNode->key, problemNode->value);
+        problemNode = hook;
+        this->insertHelper(hook, newNode);
+    }
 
 };
 

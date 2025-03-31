@@ -22,7 +22,10 @@ bool AVLTree::insert(const string &key, int value) {
     }
     insertHelper(root, newNode);
     treeHeight = root->findHeight(root);
-    root->getBalance(root);
+    this->updateBalances(root);
+
+
+
     treeSize++;
     return true;
 }
@@ -80,7 +83,6 @@ optional<int> AVLTree::getHelper(AVLNode *node, const string& key) const {
 
 bool AVLTree::remove(const string &key) {
     bool removed = removeHelper(root, key);
-    treeHeight = root->findHeight(root);
     return removed;
 }
 
@@ -93,26 +95,29 @@ bool AVLTree::removeHelper(AVLNode *&node, const string& key) {
             node = nullptr;
         }
         else if (node->left != nullptr && node->right == nullptr) {
-            node->key = node->left->key;
-            node->value = node->left->value;
-            node->left = nullptr;
+            node = node->left;
         }
         else if (node->left == nullptr && node->right != nullptr) {
-            node->key = node->right->key;
-            node->value = node->right->value;
-            node->right = nullptr;
+            node = node->right;
         }
         else{
             AVLNode *parent = node;
             AVLNode *successor = node->right;
-            while (successor->left != nullptr) {
+            int counter = 0;
+            while (successor != nullptr) {
+                if (successor->left == nullptr) {
+                    node->key = successor->key;
+                    node->value = successor->value;
+                    if (counter == 1) {
+                        parent->right = nullptr;
+                    }else {
+                        parent->left = nullptr;
+                    }
+                }
+                counter++;
                 parent = successor;
                 successor = successor->left;
             }
-            node->key = successor->key;
-            node->value = successor->value;
-            delete successor;
-            parent->left = nullptr;
         }
         treeSize--;
         return true;
@@ -144,11 +149,11 @@ int &AVLTree::overLoadOneHelper(const string &key, AVLNode *node) {
     }
 }
 
-vector<string> AVLTree::findRange(string lowKey, string highKey) const {
+vector<int> AVLTree::findRange(string lowKey, string highKey) const {
     AVLNodeVectorVisit v;
     findRangeHelper(root, v, lowKey, highKey);
 
-    return v.keys;
+    return v.values;
 }
 
 void AVLTree::findRangeHelper(AVLNode *node, AVLNodeVisitor& visitor, string lowKey, string highKey) const {
