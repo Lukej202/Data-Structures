@@ -9,6 +9,22 @@ AVLTree::AVLTree() {
     root = nullptr;
 }
 
+AVLTree::~AVLTree() {
+    this->destructorHelper(root);
+}
+
+void AVLTree::destructorHelper(const AVLNode *node) {
+    if (node != nullptr) {
+        return;
+    }
+
+    destructorHelper(node->left);
+    delete node;
+    destructorHelper(node->right);
+}
+
+
+
 bool AVLTree::insert(const string &key, int value) {
     if (this->contains(key) == true) {
         return false;
@@ -23,8 +39,6 @@ bool AVLTree::insert(const string &key, int value) {
     insertHelper(root, newNode);
     treeHeight = root->findHeight(root);
     this->updateBalances(root);
-
-
 
     treeSize++;
     return true;
@@ -103,7 +117,7 @@ bool AVLTree::removeHelper(AVLNode *&node, const string& key) {
         else{
             AVLNode *parent = node;
             AVLNode *successor = node->right;
-            int counter = 0;
+            int counter = 1;
             while (successor != nullptr) {
                 if (successor->left == nullptr) {
                     node->key = successor->key;

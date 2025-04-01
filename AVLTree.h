@@ -93,7 +93,9 @@ public:
 
     AVLTree();
 
-    //~AVLTree();
+    ~AVLTree();
+
+    void destructorHelper(const AVLNode *node);
 
     bool insert(const string& key, int value);
 
@@ -147,17 +149,35 @@ public:
             return;
         }
         checkBalnces(node->left);
-        if (node->balance > 1 || node->balance < -1) {
-            this->Rotate(node);
+        if (node->balance > 1) {
+            this->rightRotate(node);
+        }
+        if (node->balance < -1) {
+            this->leftRotate(node);
         }
         checkBalnces(node->right);
     }
 
-    void Rotate(AVLNode*& problemNode) {
+    void rightRotate(AVLNode*& problemNode) {
+        AVLNode* hook = problemNode->left;
+        AVLNode* newNode = new AVLNode(problemNode->key, problemNode->value);
+        problemNode->key = hook->key;
+        problemNode->value = hook->value;
+        problemNode->left = hook->left;
+        problemNode->right = hook->right;
+        delete hook;
+        this->insertHelper(problemNode, newNode);
+    }
+
+    void leftRotate(AVLNode*& problemNode) {
         AVLNode* hook = problemNode->right;
         AVLNode* newNode = new AVLNode(problemNode->key, problemNode->value);
-        problemNode = hook;
-        this->insertHelper(hook, newNode);
+        problemNode->key = hook->key;
+        problemNode->value = hook->value;
+        problemNode->left = hook->left;
+        problemNode->right = hook->right;
+        delete hook;
+        this->insertHelper(problemNode, newNode);
     }
 
 };
