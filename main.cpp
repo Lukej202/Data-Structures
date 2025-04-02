@@ -17,8 +17,7 @@ int main() {
     tree.insert("O", 56);
     tree.insert("L", 2);
 
-    tree.remove("E");
-    tree.remove("B");
+
 
     return 0;
 }
