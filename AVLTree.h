@@ -18,6 +18,7 @@ public:
     string key;
     int value;
     int height;
+    int depth;
     int balance;
     int leftHeight;
     int rightHeight;
@@ -43,6 +44,8 @@ public:
     void setHeight(int h) {
         height = h;
     }
+
+    
 
     int findHeight(AVLNode *node) {
         if (node == nullptr) {
@@ -85,7 +88,7 @@ class AVLNodeVectorVisit : public AVLNodeVisitor {
 class AVLTree {
 
 public:
-    AVLNode *root;
+    mutable AVLNode *root;
 
     int treeSize = 0;
 
@@ -99,7 +102,7 @@ public:
 
     bool insert(const string& key, int value);
 
-    void insertHelper(AVLNode*& current, AVLNode* insertNode);
+    void insertHelper(AVLNode *&current, AVLNode *insertNode) const;
 
     bool remove(const string& key);
 
@@ -119,7 +122,7 @@ public:
 
     vector<int> findRange(string lowKey, string highKey) const;
 
-    void findRangeHelper(AVLNode *node, AVLNodeVisitor& visitor, string lowKey, string highKey) const;
+    void findRangeHelper(AVLNode *node, AVLNodeVisitor& visitor, const string& lowKey, const string& highKey) const;
 
     vector<string> keys() const;
 
@@ -129,11 +132,15 @@ public:
 
     size_t getHeight() const;
 
-    //ostream& operator<<(ostream& os, const AVLTree & avltree) const;
+    ostream& operator<<(ostream& os, const AVLTree & avltree) const;
 
-    //AVLTree(const AVLTree& other);
+    AVLTree(const AVLTree& other);
 
-    //void operator=(const AVLTree& other);
+    void copyConstructorHelper(const AVLTree &other ,AVLNode *node, AVLNode *&newTreeNode);
+
+    void operator=(const AVLTree& other);
+
+    void assignmentOperatorHelper(const AVLTree& other, AVLNode *node, AVLNode *&newTreeNode);
 
     void updateBalances(AVLNode *node) {
         if (node == nullptr) {
@@ -159,25 +166,11 @@ public:
     }
 
     void rightRotate(AVLNode*& problemNode) {
-        AVLNode* hook = problemNode->left;
-        AVLNode* newNode = new AVLNode(problemNode->key, problemNode->value);
-        problemNode->key = hook->key;
-        problemNode->value = hook->value;
-        problemNode->left = hook->left;
-        problemNode->right = hook->right;
-        delete hook;
-        this->insertHelper(problemNode, newNode);
+
     }
 
     void leftRotate(AVLNode*& problemNode) {
-        AVLNode* hook = problemNode->right;
-        AVLNode* newNode = new AVLNode(problemNode->key, problemNode->value);
-        problemNode->key = hook->key;
-        problemNode->value = hook->value;
-        problemNode->left = hook->left;
-        problemNode->right = hook->right;
-        delete hook;
-        this->insertHelper(problemNode, newNode);
+
     }
 
 };

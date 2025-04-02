@@ -17,6 +17,15 @@ int main() {
     tree.insert("O", 56);
     tree.insert("L", 2);
 
+    AVLTree tree2;
+    tree2.insert("M", 4);
+    tree2.insert("D", 3);
+    tree2.insert("C", 2);
+    tree2.insert("S", 1);
+
+
+
+
 
 
     return 0;

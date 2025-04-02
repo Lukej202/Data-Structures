@@ -15,16 +15,14 @@ AVLTree::~AVLTree() {
 }
 ///destructorHelper(const AVLNode *node)
 ///helper function for the destructor that
-///recursively deletes all of the trees nodes using a preorder traversal
+///recursively deletes all of the trees nodes using a postorder traversal
 ///@param *node the tree node to start with typically root
 void AVLTree::destructorHelper(const AVLNode *node) {
-    if (node != nullptr) {
-        return;
-    }
-
-    destructorHelper(node->left);
-    delete node;
-    destructorHelper(node->right);
+   if (node) {
+       destructorHelper(node->left);
+       destructorHelper(node->right);
+       delete node;
+   }
 }
 
 
@@ -40,12 +38,7 @@ bool AVLTree::insert(const string &key, int value) {
         return false;
     }
     AVLNode* newNode = new AVLNode(key, value);
-    if (root == nullptr) {
-        root = newNode;
-        treeSize++;
-        treeHeight++;
-        return true;
-    }
+
     insertHelper(root, newNode);
     treeHeight = root->findHeight(root);
     this->updateBalances(root);
@@ -57,7 +50,11 @@ bool AVLTree::insert(const string &key, int value) {
 ///inserts helper function to recursively insert a node into the tree
 ///@param current the node to start at typically root
 ///@param insertNode the node to insert
-void AVLTree::insertHelper(AVLNode *&current, AVLNode *insertNode) {
+void AVLTree::insertHelper(AVLNode *&current, AVLNode *insertNode) const{
+    if (root == nullptr) {
+        root = insertNode;
+        return;
+    }
     if (current == nullptr) {
         current = insertNode;
         return;
@@ -133,6 +130,8 @@ optional<int> AVLTree::getHelper(AVLNode *node, const string& key) const {
 ///@return returns true if the key is found and removed and false if not
 bool AVLTree::remove(const string &key) {
     bool removed = removeHelper(root, key);
+    treeHeight = root->findHeight(root);
+    this->updateBalances(root);
     return removed;
 }
 ///removeHelper(AVLNode *&node, const string& key)
@@ -223,12 +222,12 @@ vector<int> AVLTree::findRange(string lowKey, string highKey) const {
     return v.values;
 }
 ///findRangeHelper(AVLNode *node, AVLNodeVisitor& visitor, string lowKey, string highKey)
-///findRange's helper function to recursively find all of the values
+///findRange's helper function to recursively find all the values uses an inorder traversal algorithm
 ///@param node the node to start the search typically root
 ///@param visitor a visitor object which has a vector with the values in it
 ///@param lowKey the lower bound for the range
 ///@param highKey the upper bound for the range
-void AVLTree::findRangeHelper(AVLNode *node, AVLNodeVisitor& visitor, string lowKey, string highKey) const {
+void AVLTree::findRangeHelper(AVLNode *node, AVLNodeVisitor& visitor, const string& lowKey, const string& highKey) const {
     if (node == nullptr) {
         return;
     }
@@ -273,3 +272,65 @@ size_t AVLTree::size() const {
 size_t AVLTree::getHeight() const {
     return treeHeight;
 }
+
+///AVLTree(const AVLTree &other)
+///copy constructor for the AVLTree class can take a
+///preexisting AVLTree and copy it to an empty AVLTree
+///does this recursively by calling a helper function
+///@param other the tree to be copied
+AVLTree::AVLTree(const AVLTree &other){
+    copyConstructorHelper(other, other.root, root);
+}
+
+///copyConstructorHelper(const AVLTree &other, AVLNode *node, AVLNode *&newTreeNode)
+///copy constructors helper function recursively traverses the tree to be copied using
+///a preorder traversal
+///@param other the tree to be copied
+///@param node the tree to be copied's nodes
+///@param newTreeNode the new trees nodes
+void AVLTree::copyConstructorHelper(const AVLTree &other, AVLNode *node, AVLNode *&newTreeNode) {
+    if (node == nullptr) {
+        return;
+    }
+        AVLNode* newNode = new AVLNode(node->key,node->value);
+        newNode->balance = node->balance;
+        newNode->height = node->height;
+
+        newTreeNode = newNode;
+
+        copyConstructorHelper(other, node->left, newTreeNode->left);
+        copyConstructorHelper(other, node->right, newTreeNode->right);
+
+}
+///operator=(const AVLTree &other)
+///the assignment operator for the AVLTree class this works the exact same
+///way as the copy constructor but can handel copieing a tree into a tree with stuff in it
+//////@param other the tree to be copied
+void AVLTree::operator=(const AVLTree &other) {
+    this->destructorHelper(root);
+    assignmentOperatorHelper(other, other.root, root);
+}
+///assignmentOperatorHelper(const AVLTree &other, AVLNode *node, AVLNode *&newTreeNode)
+///assignment operators helper function recursively traverses the tree to be copied using
+///a preorder traversal
+///@param other the tree to be copied
+///@param node the tree to be copied's nodes
+///@param newTreeNode the new trees nodes
+void AVLTree::assignmentOperatorHelper(const AVLTree &other, AVLNode *node, AVLNode *&newTreeNode) {
+    if (node == nullptr) {
+        return;
+    }
+
+    AVLNode* newNode = new AVLNode(node->key,node->value);
+    newNode->balance = node->balance;
+    newNode->height = node->height;
+
+    newTreeNode = newNode;
+
+    assignmentOperatorHelper(other, node->left, newTreeNode->left);
+    assignmentOperatorHelper(other, node->right, newTreeNode->right);
+
+}
+
+
+
