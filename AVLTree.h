@@ -45,7 +45,7 @@ public:
         height = h;
     }
 
-    
+
 
     int findHeight(AVLNode *node) {
         if (node == nullptr) {
@@ -62,7 +62,6 @@ public:
     }
 
 
-    int numChildren(AVLNode *node);
 
     int getBalance(AVLNode *node) {
         balance = node->leftHeight - node->rightHeight;
@@ -132,7 +131,9 @@ public:
 
     size_t getHeight() const;
 
-    ostream& operator<<(ostream& os, const AVLTree & avltree) const;
+    friend ostream& operator<<(ostream& os, const AVLTree & avltree);
+
+    ostream& printerHelper(AVLNode* node, ostream& os) const;
 
     AVLTree(const AVLTree& other);
 
@@ -141,6 +142,17 @@ public:
     void operator=(const AVLTree& other);
 
     void assignmentOperatorHelper(const AVLTree& other, AVLNode *node, AVLNode *&newTreeNode);
+
+    void updateDepths(AVLNode *&node, int count) {
+        if (node == nullptr) {
+            return;
+        }
+
+        node->depth = count;
+        updateDepths(node->left, count + 1);
+        updateDepths(node->right, count + 1);
+
+    }
 
     void updateBalances(AVLNode *node) {
         if (node == nullptr) {

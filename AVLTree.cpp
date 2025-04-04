@@ -43,6 +43,8 @@ bool AVLTree::insert(const string &key, int value) {
     treeHeight = root->findHeight(root);
     this->updateBalances(root);
 
+    this->updateDepths(root, 0);
+
     treeSize++;
     return true;
 }
@@ -132,6 +134,7 @@ bool AVLTree::remove(const string &key) {
     bool removed = removeHelper(root, key);
     treeHeight = root->findHeight(root);
     this->updateBalances(root);
+    this->updateDepths(root, 0);
     return removed;
 }
 ///removeHelper(AVLNode *&node, const string& key)
@@ -273,6 +276,24 @@ size_t AVLTree::getHeight() const {
     return treeHeight;
 }
 
+ostream& operator<<(ostream& os, const AVLTree& tree) {
+    return tree.printerHelper(tree.root, os);
+}
+
+ostream& AVLTree::printerHelper(AVLNode *node, ostream& os) const{
+    if (node == nullptr) {
+        return os;
+    }
+    printerHelper(node->right, os);
+    for (int i = 0; i < node->depth ; i++) {
+        os << "  ";
+    }
+    os << "<" << node->key << "," << node->value << ">" << endl;;
+    printerHelper(node->left, os);
+    return os;
+}
+
+
 ///AVLTree(const AVLTree &other)
 ///copy constructor for the AVLTree class can take a
 ///preexisting AVLTree and copy it to an empty AVLTree
@@ -331,6 +352,5 @@ void AVLTree::assignmentOperatorHelper(const AVLTree &other, AVLNode *node, AVLN
     assignmentOperatorHelper(other, node->right, newTreeNode->right);
 
 }
-
 
 
