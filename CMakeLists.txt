@@ -1,15 +1,8 @@
 cmake_minimum_required(VERSION 3.30)
-project(hashtable)
+project(untitled1)
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_executable(yourTests main.cpp
-        HashTable.cpp
-        HashTable.h)
-
-
-add_executable(hashTableTests HashTableTests.cpp
-        HashTable.cpp
-        HashTable.h
-        HashTableTests.cpp
-        HashTableTests.cpp)
+add_executable(untitled1 main.cpp
+        AVLTree.cpp
+        AVLTree.h)
