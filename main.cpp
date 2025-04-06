@@ -8,21 +8,14 @@ using namespace std;
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 int main() {
     AVLTree tree;
-    tree.insert("G", 76);
-    tree.insert("E", 9);
-    tree.insert("F", 4);
+    tree.insert("F", 76);
+    tree.insert("C", 0);
     tree.insert("B", 3);
-    tree.insert("C", 2);
+    tree.insert("Z", 0);
     tree.insert("A", 1);
-    tree.insert("W", 0);
-    tree.insert("O", 56);
     tree.insert("L", 2);
-    
-
-
+    tree.insert("G", 4);
     cout << tree;
-
-
 
 
     return 0;

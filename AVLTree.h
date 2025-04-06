@@ -17,21 +17,21 @@ class AVLNode {
 public:
     string key;
     int value;
-    int height;
+    int height = 0;
     int depth;
-    int balance;
-    int leftHeight;
-    int rightHeight;
+    int balance ;
+    int leftHeight = -1;
+    int rightHeight = -1;
+    AVLNode* parent;
     AVLNode *left;
     AVLNode *right;
 
     AVLNode(string k, int v) {
         key = k;
         value = v;
-        height = 0;
+        height = -1;
         left = nullptr;
         right = nullptr;
-
     }
 
     AVLNode(string k, int h, AVLNode *l, AVLNode *r) {
@@ -46,10 +46,8 @@ public:
     }
 
 
-
     int findHeight(AVLNode *node) {
         if (node == nullptr) {
-            this->height = -1;
             return -1;
         }else {
             int leftHeight = findHeight(node->left);
@@ -59,14 +57,27 @@ public:
             node->rightHeight = rightHeight;
             return 1 + max(leftHeight, rightHeight);
         }
+
     }
 
+    bool ReplaceChild(AVLNode* currentChild, AVLNode* newChild) {
+        if (left == currentChild) {
+            left = newChild;
+            return true;
+        }
+        else if (right == currentChild) {
+            right = newChild;
+            return true;
+        }
 
-
-    int getBalance(AVLNode *node) {
-        balance = node->leftHeight - node->rightHeight;
-        return balance;
+        // currentChild is not a child of this node
+        return false;
     }
+
+    void getBalance() {
+        balance = leftHeight - rightHeight;
+    }
+
 };
 
 class AVLNodeVisitor {
@@ -101,7 +112,7 @@ public:
 
     bool insert(const string& key, int value);
 
-    void insertHelper(AVLNode *&current, AVLNode *insertNode) const;
+    void insertHelper(AVLNode *&current, AVLNode *insertNode);
 
     bool remove(const string& key);
 
@@ -154,35 +165,87 @@ public:
 
     }
 
-    void updateBalances(AVLNode *node) {
+
+    void rebalance(AVLNode *&node) {
         if (node == nullptr) {
             return;
         }
-        updateBalances(node->left);
-        node->getBalance(node);
-        updateBalances(node->right);
+        if (node->balance < -2) {
+            if (node->right != nullptr) {
+                if (node->right->balance > 1) {
+                    rightRotate(node->right);
+                }
+            }
+            leftRotate(node);
+        }
+        if (node->balance > 2) {
+            if (node->left != nullptr) {
+                if (node->left->balance < -1) {
+                    leftRotate(node->left);
+                }
+            }
+            rightRotate(node);
+        }
     }
 
-    void checkBalnces(AVLNode *node) {
-        if (node == nullptr) {
-            return;
+    void rightRotate(AVLNode*& node) {
+        AVLNode* parent = node->parent;
+        AVLNode* leftChild;
+        AVLNode* leftRightChild;
+        if (node->left != nullptr) {
+            leftChild = node->left;
+        }else {
+            leftChild = nullptr;
         }
-        checkBalnces(node->left);
-        if (node->balance > 1) {
-            this->rightRotate(node);
+        if (leftChild != nullptr && leftChild->right != nullptr) {
+            leftRightChild = leftChild->right;
+        }else {
+            leftRightChild = nullptr;
         }
-        if (node->balance < -1) {
-            this->leftRotate(node);
+
+
+        node->left = leftRightChild;
+        if (leftChild != nullptr) {
+            leftChild->right = node;
         }
-        checkBalnces(node->right);
+
+        if (parent) {
+            parent->ReplaceChild(node, leftChild);
+        }
+        else {
+            root = leftChild;
+            root->parent = nullptr;
+        }
     }
 
-    void rightRotate(AVLNode*& problemNode) {
+    void leftRotate(AVLNode*& node) {
+        AVLNode* parent = node->parent;
+        AVLNode* rightChild;
+        AVLNode* rightLeftChild;
+        if (node->right != nullptr) {
+            rightChild = node->right;
+        }else {
+            rightChild = nullptr;
+        }
+        if (rightChild != nullptr && rightChild->left != nullptr) {
+            rightLeftChild = rightChild->left;
+        }else {
+            rightLeftChild = nullptr;
+        }
 
-    }
 
-    void leftRotate(AVLNode*& problemNode) {
+        node->right = rightLeftChild;
+        if (rightChild != nullptr) {
+            rightChild->left = node;
+        }
 
+        if (parent) {
+            parent->ReplaceChild(node, rightChild);
+        }
+        else {
+            root = rightChild;
+            root->parent = nullptr;
+        }
     }
 
 };

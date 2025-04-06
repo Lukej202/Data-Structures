@@ -40,8 +40,9 @@ bool AVLTree::insert(const string &key, int value) {
     AVLNode* newNode = new AVLNode(key, value);
 
     insertHelper(root, newNode);
-    treeHeight = root->findHeight(root);
-    this->updateBalances(root);
+    treeHeight = root->height;
+
+    root->getBalance();
 
     this->updateDepths(root, 0);
 
@@ -52,9 +53,12 @@ bool AVLTree::insert(const string &key, int value) {
 ///inserts helper function to recursively insert a node into the tree
 ///@param current the node to start at typically root
 ///@param insertNode the node to insert
-void AVLTree::insertHelper(AVLNode *&current, AVLNode *insertNode) const{
+///@param count to update node heights
+void AVLTree::insertHelper(AVLNode *&current, AVLNode *insertNode){
     if (root == nullptr) {
         root = insertNode;
+        root->parent = nullptr;
+        root->height = 0;
         return;
     }
     if (current == nullptr) {
@@ -62,11 +66,20 @@ void AVLTree::insertHelper(AVLNode *&current, AVLNode *insertNode) const{
         return;
     }
     if (insertNode->key < current->key) {
+        if (current->left == nullptr) {
+            insertNode->parent = current;
+        }
         insertHelper(current->left, insertNode);
     }
     if (insertNode->key > current->key) {
+        if (current->right == nullptr) {
+            insertNode->parent = current;
+        }
         insertHelper(current->right, insertNode);
     }
+    current->findHeight(current);
+    rebalance(current);
+    current->getBalance();
 }
 ///contains(const string &key)
 ///checks if the tree contains a node with a certain key
@@ -132,8 +145,8 @@ optional<int> AVLTree::getHelper(AVLNode *node, const string& key) const {
 ///@return returns true if the key is found and removed and false if not
 bool AVLTree::remove(const string &key) {
     bool removed = removeHelper(root, key);
-    treeHeight = root->findHeight(root);
-    this->updateBalances(root);
+    treeHeight = root->height;
+
     this->updateDepths(root, 0);
     return removed;
 }
@@ -275,11 +288,21 @@ size_t AVLTree::size() const {
 size_t AVLTree::getHeight() const {
     return treeHeight;
 }
-
+///operator<<(ostream& os, const AVLTree& tree)
+///the << overload function to print out the tree in the form
+///of the tree printed out sideways
+///@param os the ostream to output
+///@param tree the tree to print out
+///@ return the ostream that will print out the tree
 ostream& operator<<(ostream& os, const AVLTree& tree) {
     return tree.printerHelper(tree.root, os);
 }
-
+///printerHelper(AVLNode *node, ostream& os)
+///the << overload functions helper
+///uses an inorder traversal to print out the tree
+///@param node the node of the tree to start at typically root
+///@param os the ostream to output
+///@ return the ostream that will print out the tree
 ostream& AVLTree::printerHelper(AVLNode *node, ostream& os) const{
     if (node == nullptr) {
         return os;
@@ -352,5 +375,4 @@ void AVLTree::assignmentOperatorHelper(const AVLTree &other, AVLNode *node, AVLN
     assignmentOperatorHelper(other, node->right, newTreeNode->right);
 
 }
-
 
