@@ -12,15 +12,15 @@
 #define HASHTABLE_H
 #include <functional>
 #include <optional>
+#include <set>
 #include <string>
 #include <vector>
 class LinkedListNode {
 public:
     std::string key;
-    int value;
     LinkedListNode* next;
 
-    LinkedListNode(const std::string &k, int v);;
+    LinkedListNode(const std::string &k);;
 };
 
 
@@ -44,34 +44,27 @@ public:
     BucketType type;
     LinkedListNode* head{};
     LinkedListNode* tail{};
+    int size = 0;
 
     HashTableBucket();
 
-    ~HashTableBucket();
-
-    void listInsert(const std::string &k, int v);
-
-    void insert(const std::string& k, int v);
+    void listInsert(const std::string &k);
 
     bool search(const std::string& k) const;
 
-    int listGet(const std::string &k) const;
+    size_t listGet(const std::string &k) const;
 
-    [[nodiscard]] int& getRef(const std::string& k) const;
+    // [[nodiscard]] size_t getRef(const std::string& k) const;
 
     bool deleteNode(const std::string &k);
 
     int listSize() const;
-
-    int size() const;
 
     void load();
 
     void kill();
 
     BucketType getType() const;
-
-    std::string toString() const;
 
     std::string toString(size_t index) const;
 
@@ -115,22 +108,24 @@ public:
     //this vector is going to hold key value pairs for table resizeing
     std::vector<HashTableBucket> buckets;
 
-
+    void clear();
 
     //this is a method to give a bucket to put a key and vaulue to
     static int hash(const std::string& k, int size);
 
-    bool insert(const std::string& key, int value);
+    bool insert(const std::string& key);
 
     bool remove(const std::string& key);
 
-    std::optional<int> get(const std::string& key) const;
+    std::optional<size_t> get(const std::string& key) const;
 
     bool contains(const std::string& key) const;
 
-    int& operator[](const std::string& key);
+    // size_t& operator[](const std::string& key);
 
     std::vector<std::string> keys() const;
+
+    std::set<std::string> uniqueKeys() const;
 
     double alpha() const;
 

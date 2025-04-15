@@ -11,6 +11,7 @@
 #include <iostream>
 #include <numeric>
 #include <random>
+#include <set>
 #include <utility>
 #include <sstream>
 #include <vector>
@@ -29,6 +30,19 @@ HashTable::HashTable(size_t initCapacity) {
         buckets.push_back(bucket);
     }
 }
+
+void HashTable::clear() {
+    for (auto bucket : buckets) {
+        LinkedListNode* current = bucket.head;
+        while (current != nullptr) {
+            LinkedListNode* next = current->next;
+            delete current;
+            current = next;
+        }
+        bucket.head = nullptr;
+    }
+}
+
 
 /// hash(key, value)
 /// hash function that takes the key if it can be conveted
@@ -53,7 +67,7 @@ int HashTable::hash(const std::string &k, const int size) {
 /// @param value the value assosiated with the given key
 /// @return if key is in the table, or if the table is full, return false
 /// otherwise return true
-bool HashTable::insert(const string& key, int value) {
+bool HashTable::insert(const string& key) {
     //the time complexity for this method would be O(n) if table is not being resized
     //because the function is calling .search() to check if the key is not in the table
     //.search() is not constant time because it is using a for loop to find the node making it O(n)
@@ -64,7 +78,7 @@ bool HashTable::insert(const string& key, int value) {
     }
 
     if (buckets[h].search(key) == false){
-        buckets[h].listInsert(key, value);
+        buckets[h].listInsert(key);
         return true;
      }
 
@@ -103,17 +117,17 @@ bool HashTable::contains(const string& key) const {
 /// @param key the key to search for
 /// @return the value associated with the key, if the key is not
 /// in the table find returns nullopt
-optional<int> HashTable::get(const string& key) const {
-    //the time complexity for this function is O(n)
-    //its calling 2 separate functions .search() and .listGet()
-    //these are both O(n) which makes this function O(n) because they iterate over a buckets linked list of size n
-    //making get() O(n)
-    int h = hash(key, buckets.size());
-    if (buckets[h].search(key) == false) {
-        return nullopt;
-    }
-    return  buckets[h].listGet(key);
-}
+// optional<size_t> HashTable::get(const string& key) const {
+//     //the time complexity for this function is O(n)
+//     //its calling 2 separate functions .search() and .listGet()
+//     //these are both O(n) which makes this function O(n) because they iterate over a buckets linked list of size n
+//     //making get() O(n)
+//     int h = hash(key, buckets.size());
+//     if (buckets[h].search(key) == false) {
+//         return nullopt;
+//     }
+//     return  buckets[h].listGet(key);
+// }
 
 /// operator[key]
 /// return a reference to the value associated with the key
@@ -124,20 +138,20 @@ optional<int> HashTable::get(const string& key) const {
 /// @param key the key associated with the value to search for
 /// @return a reference to the value associated with the key
 /// if the key is not in the table, the behavior is undefined
-int& HashTable::operator[](const string& key) {
-    // DO NOT return a local variable, you want to return the value
-    // stored in the slot with the key argument
-    // this return is just here so the code will compile correctly
-    // you will eventually replace this
-
-    //This function is O(n)
-    //because it is calling getRef() which is O(n) because it is iterating over a buckets linked list of size n
-    //making this function O(n)
-    int h = hash(key, buckets.size());
-
-    return buckets[h].getRef(key);
-
-}
+// int& HashTable::operator[](const string& key) {
+//     // DO NOT return a local variable, you want to return the value
+//     // stored in the slot with the key argument
+//     // this return is just here so the code will compile correctly
+//     // you will eventually replace this
+//
+//     //This function is O(n)
+//     //because it is calling getRef() which is O(n) because it is iterating over a buckets linked list of size n
+//     //making this function O(n)
+//     int h = hash(key, buckets.size());
+//
+//     return buckets[h].getRef(key);
+//
+// }
 
 /// keys()
 /// get all the keys stored in the table
@@ -145,11 +159,25 @@ int& HashTable::operator[](const string& key) {
 ///  should all be just from NORMAL slots
 vector<string> HashTable::keys() const {
     vector<string> keys;
-    for (int i = 0; i < std:: size(buckets); i++) {
-        if (buckets[i].head != nullptr) {
-            LinkedListNode* current = buckets[i].head;
+    for (const auto & bucket : buckets) {
+        if (bucket.head != nullptr) {
+            LinkedListNode* current = bucket.head;
             while (current != nullptr) {
                 keys.push_back(current->key);
+                current = current->next;
+            }
+        }
+    }
+    return keys;
+}
+
+set<string> HashTable::uniqueKeys() const {
+    set<string> keys;
+    for (const auto & bucket : buckets) {
+        if (bucket.head != nullptr) {
+            LinkedListNode* current = bucket.head;
+            while (current != nullptr) {
+                keys.insert(current->key);
                 current = current->next;
             }
         }
@@ -187,7 +215,7 @@ size_t HashTable::size() const {
     int count = 0;
     for (int i = 0; i < std:: size(buckets); i++) {
         if (buckets[i].head != nullptr) {
-                count += buckets[i].listSize();
+                count += buckets[i].size();
             }
         }
     return count;
@@ -201,13 +229,11 @@ size_t HashTable::size() const {
 void HashTable::resizeTable(double resizeFactor) {
     int newCapacity = (int)resizeFactor * capacity();
     vector<string> keys;
-    vector<int> values;
     for (int i = 0; i < std:: size(buckets); i++) {
         if (buckets[i].head != nullptr) {
             LinkedListNode* current = buckets[i].head;
             while (current != nullptr) {
                 keys.push_back(current->key);
-                values.push_back(current->value);
                 current = current->next;
             }
         }
@@ -218,7 +244,7 @@ void HashTable::resizeTable(double resizeFactor) {
     }
     for (int i = 0; i < std:: size(keys); i++) {
         int h = hash(keys[i], buckets.size());
-        buckets[h].listInsert(keys[i], values[i]);
+        buckets[h].listInsert(keys[i]);
     }
 }
 
@@ -275,20 +301,12 @@ HashTableBucket::HashTableBucket() : type(BucketType::ESS) {
     tail = nullptr;
 }
 
-HashTableBucket::~HashTableBucket() {
-    LinkedListNode* current = head;
-    while (current != nullptr) {
-        LinkedListNode* next = current->next;
-        delete current;
-        current = next;
-    }
-}
 /// listInsert(string k, int v)
 /// inserts a key vaulue pair as a linked list node into a bucket list
 /// @param k the key
 /// @param v the value
-void HashTableBucket::listInsert(const std::string& k, const int v) {
-    LinkedListNode* newNode = new LinkedListNode(k, v);
+void HashTableBucket::listInsert(const std::string& k) {
+    LinkedListNode* newNode = new LinkedListNode(k);
     if (head == nullptr) {
         head = newNode;
         tail = newNode;
@@ -316,36 +334,36 @@ bool HashTableBucket::search(const std::string& k) const {
 ///finds and gets the value in a buckets list associated with a key
 ///@param k key
 ///@return if key is found the value for that key is returned if not return 0
-int HashTableBucket::listGet(const std::string &k) const {
-    LinkedListNode* temp = head;
-    while (temp != nullptr) {
-        if (temp->key == k) {
-            return temp->value;
-        }
-        temp = temp->next;
-    }
-    return 0;
-}
+// size_t HashTableBucket::listGet(const std::string &k) const {
+//     LinkedListNode* temp = head;
+//     while (temp != nullptr) {
+//         if (temp->key == k) {
+//             return temp->key;
+//         }
+//         temp = temp->next;
+//     }
+//     return 0;
+// }
 
 /// getRef(string k)
 /// this function is identical to list get but returns a reference
 /// to the value in a buckets linked list associated with a key
 ///  this is so the operator[] function works
-int &HashTableBucket::getRef(const std::string &k) const {
-    LinkedListNode* temp = head;
-    if (this->search(k) == true) {
-        while (temp != nullptr) {
-            if (temp->key == k) {
-                return temp->value;
-            }
-            temp = temp->next;
-        }
-    }
-        int i = 0;
-        int* j = &i;
-        cout << "Error: Key " << k << " does not exist in HashTable" << endl;
-        return *j;
-}
+// size_t &HashTableBucket::getRef(const std::string &k) const {
+//     LinkedListNode* temp = head;
+//     if (this->search(k) == true) {
+//         while (temp != nullptr) {
+//             if (temp->key == k) {
+//                 return temp->value;
+//             }
+//             temp = temp->next;
+//         }
+//     }
+//         size_t i = 0;
+//         size_t* j = &i;
+//         cout << "Error: Key " << k << " does not exist in HashTable" << endl;
+//         return *j;
+// }
 
 
 ///deleteNode(k)
@@ -364,6 +382,7 @@ bool HashTableBucket::deleteNode(const std::string& k) {
             }
             previous->next = current->next;
             delete current;
+            size--;
             return true;
         }
         previous = current;
@@ -377,13 +396,7 @@ bool HashTableBucket::deleteNode(const std::string& k) {
 ///gets the size of a buckets list
 ///@return returns the size of the list
 int HashTableBucket::listSize() const {
-    LinkedListNode* temp = head;
-    int count = 0;
-    while (temp != nullptr) {
-        count++;
-        temp = temp->next;
-    }
-    return count;
+    return size;
 }
 
 
@@ -498,4 +511,3 @@ LinkedListNode::LinkedListNode(const std::string &k, const int v) {
     this->value = v;
     next = nullptr;
 }
-

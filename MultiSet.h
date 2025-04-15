@@ -13,10 +13,11 @@
 
 class MultiSet{
     // declare your elements container and any other private member data
+private:
+    using Container = HashTable;
 public:
     // delete the one you are not using
     // keep this public
-    using Container = HashTable;
     Container elements;
     // if using a custom container, delete both above and have Container be your data structure
 
