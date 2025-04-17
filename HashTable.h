@@ -132,6 +132,8 @@ public:
     size_t capacity() const;
 
     size_t size() const;
+
+    int count(const std::string& key) const;
 };
 
 std::ostream& operator<<(std::ostream& os, const HashTable& hashTable);

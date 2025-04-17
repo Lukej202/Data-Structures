@@ -1,4 +1,5 @@
 
+
 /**
  * HashTable.h
  * CS 3100/5100
@@ -77,10 +78,8 @@ bool HashTable::insert(const string& key) {
         resizeTable();
     }
 
-    if (buckets[h].search(key) == false){
         buckets[h].listInsert(key);
         return true;
-     }
 
     return false;
 }
@@ -215,9 +214,25 @@ size_t HashTable::size() const {
     int count = 0;
     for (int i = 0; i < std:: size(buckets); i++) {
         if (buckets[i].head != nullptr) {
-                count += buckets[i].size();
+                count += buckets[i].size;
             }
         }
+    return count;
+}
+
+int HashTable::count(const std::string& key) const {
+    int count = 0;
+    for (int i = 0; i < std:: size(buckets); i++) {
+        if (buckets[i].head != nullptr) {
+            LinkedListNode* current = buckets[i].head;
+            while (current != nullptr) {
+                if (current->key == key) {
+                    count++;
+                }
+             current = current->next;
+            }
+        }
+    }
     return count;
 }
 
@@ -310,10 +325,12 @@ void HashTableBucket::listInsert(const std::string& k) {
     if (head == nullptr) {
         head = newNode;
         tail = newNode;
+        size++;
     }
     else {
         tail->next = newNode;
         tail = newNode;
+        size++;
     }
 }
 /// search(string k)
@@ -470,7 +487,7 @@ string HashTableBucket::toString(const size_t index) const {
         result << "Bucket "<< index << ": ";
         LinkedListNode* current = head;
         while (current != nullptr) {
-            result << "<" << current->key << current->value << ">";
+            result << "<" << current->key << ">";
             current = current->next;
         }
     }
@@ -486,7 +503,7 @@ string HashTableBucket::toString(const size_t index) const {
 ostream& operator<<(ostream& os, const HashTableBucket& bucket) {
     LinkedListNode* current = bucket.head;
     while (current != nullptr) {
-        os << "<" << current->key << ", " << current->value << "> ";
+        os << "<" << current->key << "> ";
         current = current->next;
     }
     return os;
@@ -506,8 +523,7 @@ ostream& operator<<(ostream& os, pair<const HashTableBucket&,  size_t> bucket) {
 }
 
 // Linked List stuff for chaining
-LinkedListNode::LinkedListNode(const std::string &k, const int v) {
+LinkedListNode::LinkedListNode(const std::string &k) {
     this->key = k;
-    this->value = v;
     next = nullptr;
 }

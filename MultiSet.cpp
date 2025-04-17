@@ -6,6 +6,7 @@
 
 MultiSet::MultiSet() = default;
 
+
 bool MultiSet::insert(const std::string &key, size_t num) {
         for (int i = 0; i < num; i++) {
                 return elements.insert(key);
@@ -21,7 +22,8 @@ bool MultiSet::remove(const std::string &key, size_t num) {
 // std::vector<std::string> MultiSet::remove(size_t num) {
 //         std::vector<std::string> elements;
 //         for (int i = 0; i < num; i++) {
-//                 LinkedListNode* current = elements.buckets[i].head;
+//                 LinkedListNode* current;
+//                 current = elements.buckets[i];
 //         }
 // }
 
@@ -62,8 +64,65 @@ size_t MultiSet::uniqueSize() const {
 
 
 void MultiSet::clear() {
-        elements.clear();
+
 }
+
+size_t MultiSet::count(const std::string &key) const {
+        return elements.count(key);
+}
+
+MultiSet::MultiSet(const MultiSet &other) {
+        std::vector<HashTableBucket> newBuckets;
+        for (int i = 0; i < other.size(); ++i) {
+                newBuckets.emplace_back();
+        }
+        for (int i = 0; i < other.size(); ++i) {
+                LinkedListNode* current = other.elements.buckets[i].head;
+                while (current != nullptr) {
+                        newBuckets[i].listInsert(current->key);
+                }
+        }
+}
+
+
+// MultiSet& MultiSet::operator=(const MultiSet &other) {
+//
+// }
+
+/////////////////
+// Set Operations
+/////////////////
+
+MultiSet MultiSet::unionWith(const MultiSet &other) const {
+        std::map<std::string, int> setOne;
+        std::map<std::string, int> setTwo;
+        std::vector<std::string> keys = this->keys();
+        std::vector<std::string> otherKeys = other.keys();
+        for (int i = 0; i < std::size(keys); ++i) {
+                if (setOne.contains(keys[i])) {
+                        setOne.at(keys[i])++;
+                }else {
+                       setOne.emplace(keys[i], 1);
+                }
+        }
+        for (int i = 0; i < std::size(otherKeys); ++i) {
+                if (setTwo.contains(otherKeys[i])) {
+                        setTwo.at(otherKeys[i])++;
+                }
+                else {
+                        setTwo.emplace(otherKeys[i], 1);
+                }
+        }
+        MultiSet result;
+        for (const auto &pair : setOne) {
+                if (!setTwo.contains(pair.first)) {
+                        result.elements.insert(pair.first);
+                }
+        }
+}
+
+
+
 
 
 

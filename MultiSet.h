@@ -7,17 +7,17 @@
  */
 #include <string>
 #include <vector>
+#include <map>
 
 #include "HashTable.h"
 
 
 class MultiSet{
     // declare your elements container and any other private member data
-private:
-    using Container = HashTable;
 public:
     // delete the one you are not using
     // keep this public
+    using Container = HashTable;
     Container elements;
     // if using a custom container, delete both above and have Container be your data structure
 
@@ -31,7 +31,7 @@ public:
      * Otherwise, your Container or other member variables should be responsible
      * for freeing the memory they are using
      */
-    ~MultiSet();
+    // ~MultiSet();
 
     /**
      * Copy constructor, this MultiSet should be a deep-copy of other
