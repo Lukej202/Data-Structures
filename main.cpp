@@ -9,14 +9,15 @@ int main() {
     myset.insert("1");
     myset.insert("2");
     myset.insert("3");
-    myset.insert("4");
-    myset.insert("5");
-    myset.insert("6");
-    myset.insert("7");
-    myset.insert("8");
-    myset.insert("8");
-    myset.insert("8");
-    myset.insert("8");
+
+    MultiSet myset2;
+    myset2.insert("1");
+    myset2.insert("1");
+    myset2.insert("4");
+    myset2.insert("5");
+    myset2.insert("6");
+
+    MultiSet myset3 = myset.unionWith(myset2);
 
 
 

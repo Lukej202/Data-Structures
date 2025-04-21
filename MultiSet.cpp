@@ -115,8 +115,56 @@ MultiSet MultiSet::unionWith(const MultiSet &other) const {
         }
         MultiSet result;
         for (const auto &pair : setOne) {
-                if (!setTwo.contains(pair.first)) {
+                if (setTwo.contains(pair.first)) {
+                        if (setTwo.at(pair.first) <= pair.second) {
+                                for (int i = 0; i < pair.second; ++i) {
+                                        result.elements.insert(pair.first);
+                                }
+                        }
+                }else {
                         result.elements.insert(pair.first);
+                }
+        }
+        for (const auto &pair : setTwo) {
+                if (setOne.contains(pair.first)) {
+                        if (setOne.at(pair.first) < pair.second) {
+                                for (int i = 0; i < pair.second; ++i) {
+                                        result.elements.insert(pair.first);
+                                }
+                        }
+                }else {
+                        result.elements.insert(pair.first);
+                }
+        }
+        return result;
+}
+
+MultiSet MultiSet::intersectionWith(const MultiSet &other) const {
+        std::map<std::string, int> setOne;
+        std::map<std::string, int> setTwo;
+        std::vector<std::string> keys = this->keys();
+        std::vector<std::string> otherKeys = other.keys();
+        for (int i = 0; i < std::size(keys); ++i) {
+                if (setOne.contains(keys[i])) {
+                        setOne.at(keys[i])++;
+                }else {
+                        setOne.emplace(keys[i], 1);
+                }
+        }
+        for (int i = 0; i < std::size(otherKeys); ++i) {
+                if (setTwo.contains(otherKeys[i])) {
+                        setTwo.at(otherKeys[i])++;
+                }
+                else {
+                        setTwo.emplace(otherKeys[i], 1);
+                }
+        }
+        MultiSet result;
+        for (const auto &pair : setOne) {
+                if (setTwo.contains(pair.first)) {
+                        if (setTwo.at(pair.first) > pair.second) {
+                                result.elements.insert(pair.first);
+                        }
                 }
         }
 }
