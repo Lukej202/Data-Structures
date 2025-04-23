@@ -64,7 +64,7 @@ size_t MultiSet::uniqueSize() const {
 
 
 void MultiSet::clear() {
-
+        elements.clear();
 }
 
 size_t MultiSet::count(const std::string &key) const {
@@ -85,9 +85,19 @@ MultiSet::MultiSet(const MultiSet &other) {
 }
 
 
-// MultiSet& MultiSet::operator=(const MultiSet &other) {
-//
-// }
+MultiSet& MultiSet::operator=(const MultiSet &other) {
+        clear();
+        std::vector<HashTableBucket> newBuckets;
+        for (int i = 0; i < other.size(); ++i) {
+                newBuckets.emplace_back();
+        }
+        for (int i = 0; i < other.size(); ++i) {
+                LinkedListNode* current = other.elements.buckets[i].head;
+                while (current != nullptr) {
+                        newBuckets[i].listInsert(current->key);
+                }
+        }
+}
 
 /////////////////
 // Set Operations
@@ -163,10 +173,66 @@ MultiSet MultiSet::intersectionWith(const MultiSet &other) const {
         for (const auto &pair : setOne) {
                 if (setTwo.contains(pair.first)) {
                         if (setTwo.at(pair.first) > pair.second) {
+                                for (int i = 0; i < pair.second; ++i) {
+                                        result.elements.insert(pair.first);
+                                }
+                        }else {
+                                for (int i = 0; i < setTwo.at(pair.first); ++i) {
+                                        result.elements.insert(pair.first);
+                                }
+                        }
+                }
+        }
+        return result;
+}
+
+MultiSet MultiSet::differenceWith(const MultiSet &other) const {
+        std::map<std::string, int> setOne;
+        std::map<std::string, int> setTwo;
+        std::vector<std::string> keys = this->keys();
+        std::vector<std::string> otherKeys = other.keys();
+        for (int i = 0; i < std::size(keys); ++i) {
+                if (setOne.contains(keys[i])) {
+                        setOne.at(keys[i])++;
+                }else {
+                        setOne.emplace(keys[i], 1);
+                }
+        }
+        for (int i = 0; i < std::size(otherKeys); ++i) {
+                if (setTwo.contains(otherKeys[i])) {
+                        setTwo.at(otherKeys[i])++;
+                }
+                else {
+                        setTwo.emplace(otherKeys[i], 1);
+                }
+        }
+        MultiSet result;
+        for (const auto &pair : setOne) {
+                if (setTwo.contains(pair.first)) {
+                    if (setTwo.at(pair.first) < pair.second) {
+                            for (int i = 0; i < pair.second - setTwo.at(pair.first); ++i) {
+                                    result.elements.insert(pair.first);
+                            }
+                    }
+                }else {
+                        for (int i = 0; i < pair.second; ++i) {
                                 result.elements.insert(pair.first);
                         }
                 }
         }
+        return result;
+}
+
+MultiSet MultiSet::symmetricDifferenceWith(const MultiSet &other) const {
+        MultiSet setOne = differenceWith(other);
+        MultiSet setTwo = other.differenceWith(*this);
+        MultiSet result = setOne.unionWith(setTwo);
+        return result;
+}
+
+std::ostream &operator<<(std::ostream &os, const MultiSet &set) {
+        os << set.elements;
+        return os;
 }
 
 

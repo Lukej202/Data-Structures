@@ -34,13 +34,7 @@ HashTable::HashTable(size_t initCapacity) {
 
 void HashTable::clear() {
     for (auto bucket : buckets) {
-        LinkedListNode* current = bucket.head;
-        while (current != nullptr) {
-            LinkedListNode* next = current->next;
-            delete current;
-            current = next;
-        }
-        bucket.head = nullptr;
+        bucket.clear();
     }
 }
 
@@ -315,6 +309,27 @@ HashTableBucket::HashTableBucket() : type(BucketType::ESS) {
     head = nullptr;
     tail = nullptr;
 }
+
+void HashTableBucket::clear() {
+    destructoHelper(head);
+}
+
+
+void HashTableBucket::destructoHelper(const LinkedListNode *node) {
+    if (node == nullptr) {
+        return;
+    }
+    if (node == tail) {
+        delete node;
+        return;
+    }
+    LinkedListNode* next = node->next;
+    destructoHelper(next);
+    delete node;
+
+}
+
+
 
 /// listInsert(string k, int v)
 /// inserts a key vaulue pair as a linked list node into a bucket list

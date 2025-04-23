@@ -7,19 +7,27 @@ using namespace std;
 int main() {
     MultiSet myset;
     myset.insert("1");
+    myset.insert("1");
     myset.insert("2");
     myset.insert("3");
+    myset.insert("4");
 
     MultiSet myset2;
     myset2.insert("1");
     myset2.insert("1");
+    myset2.insert("1");
+    myset2.insert("2");
+    myset2.insert("2");
     myset2.insert("4");
-    myset2.insert("5");
-    myset2.insert("6");
-
-    MultiSet myset3 = myset.unionWith(myset2);
+    myset2.insert("9");
 
 
+    MultiSet myset3 = myset.intersectionWith(myset2);
+    std::vector<std::string> vector = myset3.keys();
+
+    for (std::string s : vector) {
+        cout << s << endl;
+    }
 
     return 0;
 }

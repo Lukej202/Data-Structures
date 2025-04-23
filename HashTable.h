@@ -48,6 +48,10 @@ public:
 
     HashTableBucket();
 
+    void clear();
+
+    void destructoHelper(const LinkedListNode* node);
+
     void listInsert(const std::string &k);
 
     bool search(const std::string& k) const;
