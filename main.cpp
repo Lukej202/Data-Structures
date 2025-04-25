@@ -1,21 +1,19 @@
 #include <iostream>
-
-#include "AVLTree.h"
-
+#include "MultiSet.h"
 
 using namespace std;
 // TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 int main() {
-    AVLTree tree;
-    tree.insert("F", 76);
-    tree.insert("C", 0);
-    tree.insert("B", 3);
-    tree.insert("Z", 0);
-    tree.insert("A", 1);
-    tree.insert("L", 2);
-    tree.insert("G", 4);
-    cout << tree;
+    MultiSet<std::string> myset;
+    myset.insert("1");
+    myset.insert("1");
+    myset.insert("2");
+    myset.insert("3");
+    myset.insert("4");
+
+    cout << myset << endl;
+
 
 
     return 0;
