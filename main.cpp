@@ -1,32 +1,19 @@
 #include <iostream>
-#include "MultiSet.h"
 
-using namespace std;
 // TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 int main() {
-    MultiSet myset;
-    myset.insert("1");
-    myset.insert("1");
-    myset.insert("2");
-    myset.insert("3");
-    myset.insert("4");
+    // TIP Press <shortcut actionId="RenameElement"/> when your caret is at the
+    // <b>lang</b> variable name to see how CLion can help you rename it.
+    auto lang = "C++";
+    std::cout << "Hello and welcome to " << lang << "!\n";
 
-    MultiSet myset2;
-    myset2.insert("1");
-    myset2.insert("1");
-    myset2.insert("1");
-    myset2.insert("2");
-    myset2.insert("2");
-    myset2.insert("4");
-    myset2.insert("9");
-
-
-    MultiSet myset3 = myset.intersectionWith(myset2);
-    std::vector<std::string> vector = myset3.keys();
-
-    for (std::string s : vector) {
-        cout << s << endl;
+    for (int i = 1; i <= 5; i++) {
+        // TIP Press <shortcut actionId="Debug"/> to start debugging your code.
+        // We have set one <icon src="AllIcons.Debugger.Db_set_breakpoint"/>
+        // breakpoint for you, but you can always add more by pressing
+        // <shortcut actionId="ToggleLineBreakpoint"/>.
+        std::cout << "i = " << i << std::endl;
     }
 
     return 0;

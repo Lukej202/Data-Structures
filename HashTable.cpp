@@ -74,8 +74,6 @@ bool HashTable::insert(const string& key) {
 
         buckets[h].listInsert(key);
         return true;
-
-    return false;
 }
 
 /// remove(key)
@@ -127,46 +125,7 @@ bool HashTable::contains(const string& key) const {
     return buckets[h].search(key);
 }
 
-/// get(key)
-/// searches for the value associated with the given key
-/// @param key the key to search for
-/// @return the value associated with the key, if the key is not
-/// in the table find returns nullopt
-// optional<size_t> HashTable::get(const string& key) const {
-//     //the time complexity for this function is O(n)
-//     //its calling 2 separate functions .search() and .listGet()
-//     //these are both O(n) which makes this function O(n) because they iterate over a buckets linked list of size n
-//     //making get() O(n)
-//     int h = hash(key, buckets.size());
-//     if (buckets[h].search(key) == false) {
-//         return nullopt;
-//     }
-//     return  buckets[h].listGet(key);
-// }
 
-/// operator[key]
-/// return a reference to the value associated with the key
-/// this allows statements like:
-/// int value = hashTable[key];
-/// and
-/// hashTable[key] = value;
-/// @param key the key associated with the value to search for
-/// @return a reference to the value associated with the key
-/// if the key is not in the table, the behavior is undefined
-// int& HashTable::operator[](const string& key) {
-//     // DO NOT return a local variable, you want to return the value
-//     // stored in the slot with the key argument
-//     // this return is just here so the code will compile correctly
-//     // you will eventually replace this
-//
-//     //This function is O(n)
-//     //because it is calling getRef() which is O(n) because it is iterating over a buckets linked list of size n
-//     //making this function O(n)
-//     int h = hash(key, buckets.size());
-//
-//     return buckets[h].getRef(key);
-//
-// }
 
 /// keys()
 /// get all the keys stored in the table
@@ -384,40 +343,7 @@ bool HashTableBucket::search(const std::string& k) const {
     }
     return false;
 }
-///listGet(string k)
-///finds and gets the value in a buckets list associated with a key
-///@param k key
-///@return if key is found the value for that key is returned if not return 0
-// size_t HashTableBucket::listGet(const std::string &k) const {
-//     LinkedListNode* temp = head;
-//     while (temp != nullptr) {
-//         if (temp->key == k) {
-//             return temp->key;
-//         }
-//         temp = temp->next;
-//     }
-//     return 0;
-// }
 
-/// getRef(string k)
-/// this function is identical to list get but returns a reference
-/// to the value in a buckets linked list associated with a key
-///  this is so the operator[] function works
-// size_t &HashTableBucket::getRef(const std::string &k) const {
-//     LinkedListNode* temp = head;
-//     if (this->search(k) == true) {
-//         while (temp != nullptr) {
-//             if (temp->key == k) {
-//                 return temp->value;
-//             }
-//             temp = temp->next;
-//         }
-//     }
-//         size_t i = 0;
-//         size_t* j = &i;
-//         cout << "Error: Key " << k << " does not exist in HashTable" << endl;
-//         return *j;
-// }
 
 
 ///deleteNode(k)
@@ -509,29 +435,6 @@ bool HashTableBucket::isEmptyAfterRemoval() const {
     return type == BucketType::EAR;
 }
 
-
-/// format the bucket's contents to a string
-/// along with the given index
-/// if bucket is empty, the string does not
-/// have the key and value
-/// @param index the index of the bucket in the table
-/// @return a string with the index, key and value
-string HashTableBucket::toString(const size_t index) const {
-    stringstream result;
-    if (isEmpty()) {
-        result << "[empty]";
-    } else {
-        result << "Bucket "<< index << ": ";
-        LinkedListNode* current = head;
-        while (current != nullptr) {
-            result << "<" << current->key << ">";
-            current = current->next;
-        }
-    }
-    return result.str();
-}
-
-
 /// operator<<(ostream, HashTableBucket)
 /// overload of << for outputting bucket to stream
 /// @param os the ostream to output to
@@ -543,19 +446,6 @@ ostream& operator<<(ostream& os, const HashTableBucket& bucket) {
         os << "<" << current->key << "> ";
         current = current->next;
     }
-    return os;
-}
-
-/// operator<<(ostream, pair<HashTableBucket, size_t>)
-/// overload of << to output bucket to stream
-/// second argument used to print the index of the bucket in the table
-/// would be used like:
-/// cout << pair{bucket, index};
-/// @param os the ostream to output to
-/// @param bucket a pair with the bucket and bucket's index
-/// @return reference to the ostream
-ostream& operator<<(ostream& os, pair<const HashTableBucket&,  size_t> bucket) {
-    os << bucket.first.toString(bucket.second);
     return os;
 }
 
