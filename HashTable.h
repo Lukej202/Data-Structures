@@ -121,6 +121,8 @@ public:
 
     bool remove(const std::string& key);
 
+    std::vector<std::string> remove(size_t num);
+
     std::optional<size_t> get(const std::string& key) const;
 
     bool contains(const std::string& key) const;
