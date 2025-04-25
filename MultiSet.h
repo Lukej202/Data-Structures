@@ -11,7 +11,7 @@
 #include <map>
 
 #include "HashTable.h"
-
+#include <ostream>
 template <typename T>
 class MultiSet{
     // declare your elements container and any other private member data
@@ -80,9 +80,10 @@ public:
      * @return true if element was insert, false if an error was encountered
      */
     bool insert(T key, size_t num = 1) {
-        for (int i = 0; i < num; i++) {
-            return elements.insert(key);
+        for (size_t i = 0; i < num; i++) {
+            elements.insert(key);
         }
+        return true;
     }
 
     /**
@@ -101,6 +102,7 @@ public:
         for (int i = 0; i < num; i++) {
             elements.remove(key);
         }
+        return true;
     }
 
     /**
@@ -367,7 +369,10 @@ public:
      * @return reference to os
      */
     friend std::ostream& operator<< (std::ostream& os, const MultiSet& ms) {
-        os << ms.elements;
+        std::vector<T> keys = ms.keys();
+        for (int i = 0; i < std::size(keys); ++i) {
+            os << "{" << keys[i] << "}";
+        }
         return os;
     }
 };

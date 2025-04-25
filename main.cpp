@@ -8,12 +8,21 @@ int main() {
     MultiSet<char> myset;
     myset.insert('a');
     myset.insert('b');
+    myset.insert('b');
     myset.insert('c');
     myset.insert('d');
-    myset.insert('e');
-    myset.insert('f');
-    myset.insert('g');
 
+    MultiSet<char> myset2;
+    myset2.insert('a');
+    myset2.insert('b');
+    myset2.insert('e');
+    myset2.insert('y');
+
+    std::cout << myset << std::endl;
+    std::cout << myset2 << std::endl;
+
+    MultiSet<char> myset3 = myset.symmetricDifferenceWith(myset2);
+    std::cout << myset3 << std::endl;
     return 0;
 }
 

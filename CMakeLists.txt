@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.30)
-project(untitled3)
+project(untitled4)
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_executable(untitled3 main.cpp
-        MultiSet.h
-        HashTable.h)
+add_executable(untitled4 main.cpp
+        HashTable.h
+        MultiSet.h)

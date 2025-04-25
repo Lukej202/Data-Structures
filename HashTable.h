@@ -146,14 +146,14 @@ int listSize() const {
 
 
 
-std::ostream& operator<<(std::ostream& os, const HashTableBucket& bucket) {
-    LinkedListNode<T>* current = bucket.head;
-    while (current != nullptr) {
-        os << "<" << current->key << "> ";
-        current = current->next;
-    }
-    return os;
-}
+// std::ostream& operator<<(std::ostream& os, const HashTableBucket& bucket) {
+//     LinkedListNode<T>* current = bucket.head;
+//     while (current != nullptr) {
+//         os << "<" << current->key << "> ";
+//         current = current->next;
+//     }
+//     return os;
+// }
 
 };
 
@@ -300,7 +300,7 @@ public:
         return buckets[h].search(key);
     }
 
-    std::vector<std::string> keys() const {
+    std::vector<T> keys() const {
         std::vector<T> keys;
         for (const auto & bucket : buckets) {
             if (bucket.head != nullptr) {
@@ -314,7 +314,7 @@ public:
         return keys;
     }
 
-    std::set<std::string> uniqueKeys() const {
+    std::set<T> uniqueKeys() const {
         std::set<T> keys;
         for (const auto & bucket : buckets) {
             if (bucket.head != nullptr) {
@@ -358,12 +358,13 @@ public:
         return count;
     }
 
-    std::ostream& operator<<(std::ostream& os, const HashTable& hashTable) {
-        for (int i = 0; i < hashTable.capacity() ; i++) {
-            os << hashTable.buckets[i] << std::endl;
-        }
-        return os;
-    }
+    // std::ostream& operator<<(std::ostream& os, const HashTable& hashTable) {
+    //     for (int i = 0; i < hashTable.capacity() ; i++) {
+    //         os << hashTable.buckets[i];
+    //         os << std::endl;
+    //     }
+    //     return os;
+    // }
 };
 
 
