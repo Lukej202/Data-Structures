@@ -9,11 +9,14 @@ MultiSet::MultiSet() = default;
 
 bool MultiSet::insert(const std::string &key, size_t num) {
         for (int i = 0; i < num; i++) {
-                elements.insert(key);
+                return elements.insert(key);
         }
 }
 
 bool MultiSet::remove(const std::string &key, size_t num) {
+        if (num > elements.count(key)) {
+                return false;
+        }
         for (int i = 0; i < num; i++) {
                 elements.remove(key);
         }
@@ -230,7 +233,6 @@ std::ostream &operator<<(std::ostream &os, const MultiSet &set) {
         os << set.elements;
         return os;
 }
-
 
 
 

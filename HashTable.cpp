@@ -270,8 +270,7 @@ vector<size_t> HashTable::makeShuffledVector(size_t N) {
 /// @return reference to the ostream
 ostream& operator<<(ostream& os, const HashTable& hashTable) {
     for (int i = 0; i < hashTable.capacity() ; i++) {
-        os << "Bucket: " << i << " ";
-        os << hashTable.buckets[i] << endl;
+        os << hashTable.buckets[i];
     }
     return os;
     }
@@ -379,61 +378,6 @@ int HashTableBucket::listSize() const {
     return size;
 }
 
-
-/// load(key, value)
-/// update the key and value stored in the bucket
-/// bucket is marked as normal to denote it is occupied
-/// @param k new key
-/// @param v new value
-void HashTableBucket::load() {
-
-    type = BucketType::NORMAL;
-}
-
-/// kill()
-/// clear the key and value, and mark the slot as EAR (tombstone)
-///
-/// this will run if there is only one item in the linkelist
-void HashTableBucket::kill() {
-
-    type = BucketType::EAR;
-}
-
-
-/// getType()
-/// get the current type of the bucket
-/// @return the bucket's type (NORMAL, ESS, EAR)
-BucketType HashTableBucket::getType() const {
-    return type;
-}
-
-/// isEmpty()
-/// determines if bucket is empty either since start or after remove
-/// @return true if bucket is ESS or EAR, otherwise false
-bool HashTableBucket::isEmpty() const {
-    return type == BucketType::EAR || type == BucketType::ESS;
-}
-
-/// isNormal()
-/// determines if bucket is normal/occupied
-/// @return true if bucket is NORMAL, otherwise false
-bool HashTableBucket::isNormal() const {
-    return type == BucketType::NORMAL;
-}
-
-/// isEmptySinceStart()
-/// determines only if bucket is ESS
-/// @return true is the bucket is ESS, otherwise false
-bool HashTableBucket::isEmptySinceStart() const {
-    return type == BucketType::ESS;
-}
-
-/// isEmptyAfterRemoval()
-/// determines only if bucket is EAR
-/// @return true if bucket is EAR, otherwise false
-bool HashTableBucket::isEmptyAfterRemoval() const {
-    return type == BucketType::EAR;
-}
 
 /// operator<<(ostream, HashTableBucket)
 /// overload of << for outputting bucket to stream
