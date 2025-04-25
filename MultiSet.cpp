@@ -19,13 +19,9 @@ bool MultiSet::remove(const std::string &key, size_t num) {
         }
 }
 
-// std::vector<std::string> MultiSet::remove(size_t num) {
-//         std::vector<std::string> elements;
-//         for (int i = 0; i < num; i++) {
-//                 LinkedListNode* current;
-//                 current = elements.buckets[i];
-//         }
-// }
+std::vector<std::string> MultiSet::remove(size_t num) {
+        return elements.remove(num);
+}
 
 std::vector<std::string> MultiSet::keys() const {
         return elements.keys();
