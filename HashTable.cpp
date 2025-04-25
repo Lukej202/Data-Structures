@@ -93,6 +93,28 @@ bool HashTable::remove(const string& key) {
     return buckets[h].deleteNode(key);
 }
 
+std::vector<std::string> HashTable::remove(size_t num) {
+    std::vector<std::string> v;
+    if (num > size()) {
+        return v;
+    }
+    int count = 0;
+    int index = 0;
+    LinkedListNode* current = nullptr;
+    while (count < num) {
+        if (buckets[index].head == nullptr) {
+            index++;
+        }
+        current = buckets[index].head;
+        if (current != nullptr) {
+            v.push_back(current->key);
+            buckets[index].deleteNode(current->key);
+            count++;
+        }
+    }
+    return v;
+}
+
 /// contains(key)
 /// determines whether the key is in the table or not
 /// @param key the key to be searched for
