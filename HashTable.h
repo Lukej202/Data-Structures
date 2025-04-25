@@ -12,11 +12,12 @@
 #define HASHTABLE_H
 #include <functional>
 #include <optional>
+#include <ostream>
 #include <set>
 #include <string>
 #include <vector>
 template <typename T>
-class LinkedListNode<T> {
+class LinkedListNode {
 public:
     T key;
     LinkedListNode* next;
@@ -35,9 +36,6 @@ public:
 /// ESS: bucket has empty since start (has never had a key/value)
 /// EAR: bucket is empty after removal (aka tombstone, bucket used to hold
 /// a key/value but they have been removed from the table)
-enum class BucketType { NORMAL, ESS, EAR };
-
-std::ostream operator<<(const std::ostream & os, char * str);
 
 /// all members of HashTableBucket are public to make it easy
 /// methods are defined in HashTable.cpp,
@@ -48,7 +46,6 @@ std::ostream operator<<(const std::ostream & os, char * str);
 template <typename T>
 class HashTableBucket {
 public:
-    BucketType type;
     LinkedListNode<T>* head{};
     LinkedListNode<T>* tail{};
     int size = 0;
@@ -56,17 +53,17 @@ public:
     /// empty constructor
 /// initializes the value to zero (not really necessary)
 /// and sets the bucket type to empty since start
-HashTableBucket::HashTableBucket() : type(BucketType::ESS) {
+HashTableBucket(){
     head = nullptr;
     tail = nullptr;
 }
 
-void HashTableBucket::clear() {
+void clear() {
     destructoHelper(head);
 }
 
 
-void HashTableBucket::destructoHelper(const LinkedListNode<T> *node) {
+void destructoHelper(const LinkedListNode<T> *node) {
     if (node == nullptr) {
         return;
     }
@@ -86,7 +83,7 @@ void HashTableBucket::destructoHelper(const LinkedListNode<T> *node) {
 /// inserts a key vaulue pair as a linked list node into a bucket list
 /// @param k the key
 /// @param v the value
-void HashTableBucket::listInsert(const std::string& k) {
+void listInsert(T k) {
     LinkedListNode<T>* newNode = new LinkedListNode(k);
     if (head == nullptr) {
         head = newNode;
@@ -103,7 +100,7 @@ void HashTableBucket::listInsert(const std::string& k) {
 /// searches to sey if a key is in a buckets list
 /// @param k the key to search for
 /// @return true if the key was found false if it was not
-bool HashTableBucket::search(const std::string& k) const {
+bool search(T k) const {
    LinkedListNode<T>* current = head;
     while (current != nullptr) {
         if (current->key == k) {
@@ -118,7 +115,7 @@ bool HashTableBucket::search(const std::string& k) const {
 ///finds and deletes a node in a buckets list associated with a key
 ///@param k the key
 ///@return returns true if the node with the key was found and removed returns false otherwise
-bool HashTableBucket::deleteNode(const std::string& k) {
+bool deleteNode(T k) {
     LinkedListNode<T>* current = head;
     LinkedListNode<T>* previous = nullptr;
     while (current != nullptr) {
@@ -143,74 +140,13 @@ bool HashTableBucket::deleteNode(const std::string& k) {
 ///listSize()
 ///gets the size of a buckets list
 ///@return returns the size of the list
-int HashTableBucket::listSize() const {
+int listSize() const {
     return size;
 }
 
 
-/// load(key, value)
-/// update the key and value stored in the bucket
-/// bucket is marked as normal to denote it is occupied
-/// @param k new key
-/// @param v new value
-void HashTableBucket::load() {
 
-    type = BucketType::NORMAL;
-}
-
-/// kill()
-/// clear the key and value, and mark the slot as EAR (tombstone)
-///
-/// this will run if there is only one item in the linkelist
-void HashTableBucket::kill() {
-
-    type = BucketType::EAR;
-}
-
-
-/// getType()
-/// get the current type of the bucket
-/// @return the bucket's type (NORMAL, ESS, EAR)
-BucketType HashTableBucket::getType() const {
-    return type;
-}
-
-/// isEmpty()
-/// determines if bucket is empty either since start or after remove
-/// @return true if bucket is ESS or EAR, otherwise false
-bool HashTableBucket::isEmpty() const {
-    return type == BucketType::EAR || type == BucketType::ESS;
-}
-
-/// isNormal()
-/// determines if bucket is normal/occupied
-/// @return true if bucket is NORMAL, otherwise false
-bool HashTableBucket::isNormal() const {
-    return type == BucketType::NORMAL;
-}
-
-/// isEmptySinceStart()
-/// determines only if bucket is ESS
-/// @return true is the bucket is ESS, otherwise false
-bool HashTableBucket::isEmptySinceStart() const {
-    return type == BucketType::ESS;
-}
-
-/// isEmptyAfterRemoval()
-/// determines only if bucket is EAR
-/// @return true if bucket is EAR, otherwise false
-bool HashTableBucket::isEmptyAfterRemoval() const {
-    return type == BucketType::EAR;
-}
-
-
-
-/// operator<<(ostream, HashTableBucket)
-/// overload of << for outputting bucket to stream
-/// @param os the ostream to output to
-/// @param bucket the bucket being output
-/// @return reference to the ostream
-    std::ostream& operator<<(std::ostream& os, const HashTableBucket& bucket) {
+std::ostream& operator<<(std::ostream& os, const HashTableBucket& bucket) {
     LinkedListNode<T>* current = bucket.head;
     while (current != nullptr) {
         os << "<" << current->key << "> ";
@@ -218,9 +154,15 @@ bool HashTableBucket::isEmptyAfterRemoval() const {
     }
     return os;
 }
+
 };
 
-// overloads for operator<< to print buckets using cout
+/// operator<<(ostream, HashTableBucket)
+/// overload of << for outputting bucket to stream
+/// @param os the ostream to output to
+/// @param bucket the bucket being output
+/// @return reference to the ostream
+
 
 template <typename T>
 class HashTable {
@@ -231,14 +173,28 @@ private:
     // you may also want a method for your chosen probe function
 
 
-    // if using pseudo-random probing, you will need an offsets array
-    // I'm also providing a method to make the shuffled vector
-    // and a method to generate an offsets array
-    // std::vector<size_t> m_offsets;
-    static std::vector<size_t> makeShuffledVector(size_t N);
-
     // you may want a private method to resize your table
-    void resizeTable(double resizeFactor = 2.0);
+    void resizeTable(const double resizeFactor = 2.0) {
+        const int newCapacity = static_cast<int>(resizeFactor) * capacity();
+        std::vector<T> keys;
+        for (int i = 0; i < std:: size(buckets); i++) {
+            if (buckets[i].head != nullptr) {
+                LinkedListNode<T>* current = buckets[i].head;
+                while (current != nullptr) {
+                    keys.push_back(current->key);
+                    current = current->next;
+                }
+            }
+        }
+        buckets.clear();
+        for (int i = 0; i < newCapacity; i++) {
+            buckets.emplace_back();
+        }
+        for (int i = 0; i < std:: size(keys); i++) {
+            int h = hash(keys[i], buckets.size());
+            buckets[h].listInsert(keys[i]);
+        }
+    }
 
     // you can eventually remove this if you want, it is
     // temporarily here so operator[] will "work"
@@ -265,7 +221,30 @@ public:
 
     //this is a method to give a bucket to put a key and vaulue to
     static int hash(T k, int size) {
+        if (typeid(k) == typeid(int) || typeid(k) == typeid(double) || typeid(k) == typeid(float) || typeid(k) == typeid(size_t)) {
+            int i = k;
+            return abs(i % size);
+        }
+        if (typeid(k) == typeid(std::string)) {
+            std::string s = std::to_string(k);
+            try {
+                return abs(stoi(s) %size);
+            }catch (const std::invalid_argument &e) {
+                return s.length()%size;
+            }
 
+        }
+        if (typeid(k) == typeid(bool)) {
+            bool b = k;
+            if (b == true) {
+                return 1%size;
+            }else {
+                return 0;
+            }
+        }
+        if (typeid(k) == typeid(char)) {
+            return static_cast<int>(k)%size;
+        }
     }
 
     bool insert(T key) {
@@ -282,29 +261,111 @@ public:
         return true;
     }
 
-    bool remove(const std::string& key);
+    bool remove(T key) {
+        // This function is O(n)
+        // because the function .deleteNode() is called which iterates over a buckets list of size n
+        // making deleteNode() O(n)
+        // therefore remove is O(n)
+        int h = hash(key, buckets.size());
+        return buckets[h].deleteNode(key);
+    }
 
-    std::vector<std::string> remove(size_t num);
+    std::vector<T> remove(size_t num) {
+        std::vector<std::string> v;
+        if (num > size()) {
+            return v;
+        }
+        int count = 0;
+        int index = 0;
+        LinkedListNode<T>* current = nullptr;
+        while (count < num) {
+            if (buckets[index].head == nullptr) {
+                index++;
+            }
+            current = buckets[index].head;
+            if (current != nullptr) {
+                v.push_back(current->key);
+                buckets[index].deleteNode(current->key);
+                count++;
+            }
+        }
+        return v;
+    }
 
-    std::optional<size_t> get(const std::string& key) const;
+    bool contains(const std::string& key) const {
+        //the time complexity for this function is O(n)
+        //because .search() is called to find the key which is O(n) because it has to iterate a buckets linked list of size n
+        //making contains O(n)
+        int h = hash(key, buckets.size());
+        return buckets[h].search(key);
+    }
 
-    bool contains(const std::string& key) const;
+    std::vector<std::string> keys() const {
+        std::vector<T> keys;
+        for (const auto & bucket : buckets) {
+            if (bucket.head != nullptr) {
+                LinkedListNode<T>* current = bucket.head;
+                while (current != nullptr) {
+                    keys.push_back(current->key);
+                    current = current->next;
+                }
+            }
+        }
+        return keys;
+    }
 
-    // size_t& operator[](const std::string& key);
+    std::set<std::string> uniqueKeys() const {
+        std::set<T> keys;
+        for (const auto & bucket : buckets) {
+            if (bucket.head != nullptr) {
+                LinkedListNode<T>* current = bucket.head;
+                while (current != nullptr) {
+                    keys.insert(current->key);
+                    current = current->next;
+                }
+            }
+        }
+        return keys;
+    }
 
-    std::vector<std::string> keys() const;
+    size_t capacity() const {
+        return std::size(buckets);
+    }
 
-    std::set<std::string> uniqueKeys() const;
+    size_t size() const {
+        int count = 0;
+        for (int i = 0; i < std:: size(buckets); i++) {
+            if (buckets[i].head != nullptr) {
+                count += buckets[i].size;
+            }
+        }
+        return count;
+    }
 
-    double alpha() const;
+    int count(const std::string& key) const {
+        int count = 0;
+        for (int i = 0; i < std:: size(buckets); i++) {
+            if (buckets[i].head != nullptr) {
+                LinkedListNode<T>* current = buckets[i].head;
+                while (current != nullptr) {
+                    if (current->key == key) {
+                        count++;
+                    }
+                    current = current->next;
+                }
+            }
+        }
+        return count;
+    }
 
-    size_t capacity() const;
-
-    size_t size() const;
-
-    int count(const std::string& key) const;
+    std::ostream& operator<<(std::ostream& os, const HashTable& hashTable) {
+        for (int i = 0; i < hashTable.capacity() ; i++) {
+            os << hashTable.buckets[i] << std::endl;
+        }
+        return os;
+    }
 };
 
-std::ostream& operator<<(std::ostream& os, const HashTable& hashTable);
+
 
 #endif //HASHTABLE_H

@@ -1,20 +1,18 @@
 #include <iostream>
+
 #include "MultiSet.h"
 
-using namespace std;
 // TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 int main() {
-    MultiSet<std::string> myset;
-    myset.insert("1");
-    myset.insert("1");
-    myset.insert("2");
-    myset.insert("3");
-    myset.insert("4");
-
-    cout << myset << endl;
-
-
+    MultiSet<char> myset;
+    myset.insert('a');
+    myset.insert('b');
+    myset.insert('c');
+    myset.insert('d');
+    myset.insert('e');
+    myset.insert('f');
+    myset.insert('g');
 
     return 0;
 }
